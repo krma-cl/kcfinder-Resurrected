@@ -59,3 +59,7 @@ Editor de imágenes Filerobot https://scaleflex.github.io/filerobot-image-editor
 
 ## Desarrollo
 Espero poder subir actualizaciones y correcciones con mas frecuencia, aun falta un reproductor de video y un visor de documentos.
+
+## Arquitectura y hoja de ruta
+
+La dirección de la edición mantenida, segura y preparada para producción se documenta en [doc/Architecture.md](doc/Architecture.md). El documento define los principios de compatibilidad, el selector JSON, la distribución mediante Composer, los adaptadores para Laravel y Symfony y la experiencia responsiva.
