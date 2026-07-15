@@ -63,14 +63,43 @@ composer require krma-cl/kcfinder
 
 Composer instala el paquete en `vendor/krma-cl/kcfinder` y expone el namespace moderno `KCFinder\` mediante PSR-4. No publique el directorio `vendor` completo como raíz web; para la interfaz independiente utilice el ZIP tradicional o una publicación controlada de recursos.
 
-### Laravel y Symfony
+## Componentes oficiales
 
-Los adaptadores oficiales conectan el selector moderno con el almacenamiento, la autorización y los eventos de cada framework, sin agregar dependencias al núcleo:
+El núcleo, los adaptadores de frameworks y el tema visual se mantienen como proyectos independientes. Todos son opcionales y tienen su propio ciclo de versiones; instalar uno de ellos no agrega dependencias al núcleo para quienes utilizan KCFinder de manera tradicional.
 
-- [`krma-cl/kcfinder-laravel`](https://github.com/krma-cl/kcfinder-laravel), para Laravel 12 y 13.
-- [`krma-cl/kcfinder-symfony-bundle`](https://github.com/krma-cl/kcfinder-symfony-bundle), para Symfony 7.4 y 8.x con Flysystem 3.
+### Adaptador para Laravel
 
-El navegador sigue pudiendo desplegarse de manera tradicional. Los adaptadores no exigen Laravel o Symfony a quienes sólo necesitan KCFinder independiente.
+[`krma-cl/kcfinder-laravel`](https://github.com/krma-cl/kcfinder-laravel) integra KCFinder con Laravel 12 y 13, incluyendo Laravel Storage, autorización mediante Gates, publicación de configuración y eventos del selector moderno.
+
+```bash
+composer require krma-cl/kcfinder-laravel:^1.0
+```
+
+El paquete y sus versiones estables están disponibles en [Packagist](https://packagist.org/packages/krma-cl/kcfinder-laravel). Consulte el README del adaptador para publicar su configuración y conectarlo al disco y las reglas de autorización de la aplicación.
+
+### Bundle para Symfony
+
+[`krma-cl/kcfinder-symfony-bundle`](https://github.com/krma-cl/kcfinder-symfony-bundle) integra KCFinder con Symfony 7.4 y 8.x mediante servicios, eventos, autorización y almacenamiento Flysystem 3.
+
+```bash
+composer require krma-cl/kcfinder-symfony-bundle:^1.0
+```
+
+El bundle y sus versiones estables están disponibles en [Packagist](https://packagist.org/packages/krma-cl/kcfinder-symfony-bundle). Su README contiene la configuración del bundle, los servicios y el adaptador de almacenamiento.
+
+### Tema Bootstrap 5
+
+[`kcfinder-bootstrap5-theme`](https://github.com/krma-cl/kcfinder-bootstrap5-theme) ofrece una interfaz opcional basada en Bootstrap 5 y Bootstrap Icons, sin CDN ni dependencias de ejecución adicionales.
+
+1. Descargue el ZIP desde los [releases del tema](https://github.com/krma-cl/kcfinder-bootstrap5-theme/releases).
+2. Copie su directorio `dist/bootstrap5` como `themes/bootstrap5` dentro de KCFinder.
+3. Configure el tema:
+
+```php
+'theme' => 'bootstrap5',
+```
+
+Después de instalarlo o actualizarlo, elimine `cache/theme_bootstrap5.css` y `cache/theme_bootstrap5.js` si existen para que KCFinder regenere los recursos combinados. El tema clásico continúa incluido y disponible como alternativa.
 
 ## Selector moderno
 
