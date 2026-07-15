@@ -31,7 +31,7 @@ final class LocalFileMetadataReaderTest extends TestCase
             new PrefixUrlResolver('/storage/transparencia')
         );
 
-        $descriptor = $reader->describe('/01-actos/informe público.txt');
+        $descriptor = $reader->metadata('/01-actos/informe público.txt');
 
         self::assertSame('informe público.txt', $descriptor->name);
         self::assertSame('/01-actos/informe público.txt', $descriptor->path);
@@ -39,6 +39,20 @@ final class LocalFileMetadataReaderTest extends TestCase
         self::assertSame('text/plain', $descriptor->mime);
         self::assertSame(strlen($contents), $descriptor->size);
         self::assertStringNotContainsString($this->fixture->root(), json_encode($descriptor, JSON_THROW_ON_ERROR));
+    }
+
+    public function testDescribeRemainsACompatibilityAliasForMetadata(): void
+    {
+        $this->fixture->writeTypeFile('documents/report.txt', 'report');
+        $reader = new LocalFileMetadataReader(
+            $this->fixture->typeDirectory(),
+            new PrefixUrlResolver('/storage')
+        );
+
+        self::assertEquals(
+            $reader->metadata('/documents/report.txt'),
+            $reader->describe('/documents/report.txt')
+        );
     }
 
     public function testReaderRejectsTraversalBeforeResolvingTheFilesystemPath(): void

@@ -6,11 +6,13 @@ namespace KCFinder\Infrastructure;
 
 use finfo;
 use InvalidArgumentException;
+use KCFinder\Contract\FileMetadataProviderInterface;
 use KCFinder\Contract\UrlResolverInterface;
 use KCFinder\Domain\FileDescriptor;
+use KCFinder\Domain\LogicalPath;
 use RuntimeException;
 
-final class LocalFileMetadataReader
+final class LocalFileMetadataReader implements FileMetadataProviderInterface
 {
     private string $root;
 
@@ -28,7 +30,12 @@ final class LocalFileMetadataReader
 
     public function describe(string $path): FileDescriptor
     {
-        $logicalPath = $this->normalizeLogicalPath($path);
+        return $this->metadata($path);
+    }
+
+    public function metadata(string $logicalPath): FileDescriptor
+    {
+        $logicalPath = LogicalPath::fromString($logicalPath)->value();
         $physicalPath = realpath($this->root . $logicalPath);
         if ($physicalPath === false) {
             throw new RuntimeException('The requested file does not exist.');
@@ -56,21 +63,6 @@ final class LocalFileMetadataReader
             strtolower($mime),
             $size
         );
-    }
-
-    private function normalizeLogicalPath(string $path): string
-    {
-        if ($path === '' || str_contains($path, "\0") || str_contains($path, '\\')) {
-            throw new InvalidArgumentException('The logical path is invalid.');
-        }
-
-        $path = '/' . ltrim($path, '/');
-        $segments = explode('/', substr($path, 1));
-        if (in_array('', $segments, true) || in_array('.', $segments, true) || in_array('..', $segments, true)) {
-            throw new InvalidArgumentException('The logical path contains an invalid segment.');
-        }
-
-        return $path;
     }
 
     private function normalizePhysicalPath(string $path): string

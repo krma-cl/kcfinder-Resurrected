@@ -21,13 +21,8 @@ final class FileDescriptor implements JsonSerializable
             throw new InvalidArgumentException('The file name must not contain a path.');
         }
 
-        if ($path === '' || $path[0] !== '/' || str_contains($path, "\0") || str_contains($path, '\\')) {
+        if ($path === '' || $path[0] !== '/' || LogicalPath::fromString($path)->value() !== $path) {
             throw new InvalidArgumentException('The logical path must be absolute and use forward slashes.');
-        }
-
-        $segments = explode('/', substr($path, 1));
-        if (in_array('', $segments, true) || in_array('.', $segments, true) || in_array('..', $segments, true)) {
-            throw new InvalidArgumentException('The logical path contains an invalid segment.');
         }
 
         if (basename($path) !== $name) {
