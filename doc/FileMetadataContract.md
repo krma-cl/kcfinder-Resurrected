@@ -17,7 +17,7 @@ $reader = new LocalFileMetadataReader(
     new PrefixUrlResolver('/storage/transparencia')
 );
 
-$file = $reader->describe('/01-actos/diario-oficial/2013/DO-20130614.pdf');
+$file = $reader->metadata('/01-actos/diario-oficial/2013/DO-20130614.pdf');
 
 echo json_encode($file, JSON_THROW_ON_ERROR);
 ```
@@ -45,3 +45,25 @@ El resultado contiene únicamente:
 - Un `UrlResolverInterface` alternativo podrá generar URLs públicas, temporales o firmadas sin cambiar el objeto de dominio.
 
 Los errores y nombres de las clases de infraestructura podrán refinarse antes de publicar la API estable. La semántica de los cinco campos no se modificará silenciosamente.
+
+`describe()` se mantiene como alias de compatibilidad de `metadata()` para el primer prototipo publicado.
+
+## Selección con autorización
+
+El servicio de aplicación exige una política. La ruta se normaliza antes de autorizar y el proveedor de metadatos sólo se consulta cuando la política permite `select`:
+
+```php
+use KCFinder\Application\FileSelectionService;
+use KCFinder\Infrastructure\CallbackAuthorization;
+
+$authorization = new CallbackAuthorization(
+    static function (string $operation, string $path) use ($currentUser): bool {
+        return $operation === 'select' && $currentUser->canRead($path);
+    }
+);
+
+$selector = new FileSelectionService($reader, $authorization);
+$file = $selector->select('/01-actos/diario-oficial/2013/DO-20130614.pdf');
+```
+
+El callback es un punto de adaptación, no un mecanismo de autenticación. La aplicación anfitriona debe identificar al usuario y aplicar sus reglas reales. No existe una política predeterminada que autorice todas las rutas.

@@ -119,6 +119,8 @@ interface UrlResolverInterface
 
 Estas interfaces son ilustrativas. Antes de convertirlas en API pública se deben resolver manejo de errores, operaciones sobre carpetas, streams, escritura atómica y compatibilidad con archivos grandes.
 
+La implementación incremental adopta interfaces por capacidad en vez de una interfaz monolítica. Las primeras son `FileMetadataProviderInterface`, `UrlResolverInterface` y `AuthorizationInterface`, coordinadas por `FileSelectionService`. La decisión se registra en [ADR 0002](adr/0002-capability-contracts.md).
+
 El almacenamiento local será la implementación predeterminada. Flysystem podrá incorporarse como adaptador opcional, no como requisito obligatorio del núcleo.
 
 ## 7. Contrato del selector de archivos
