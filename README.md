@@ -73,3 +73,5 @@ composer test
 La dirección de la edición mantenida, segura y preparada para producción se documenta en [doc/Architecture.md](doc/Architecture.md). El documento define los principios de compatibilidad, el selector JSON, la distribución mediante Composer, los adaptadores para Laravel y Symfony y la experiencia responsiva.
 
 La superficie HTTP, acciones AJAX y formatos heredados protegidos por las pruebas de caracterización se encuentran en [doc/PublicSurface.md](doc/PublicSurface.md).
+
+La configuración mínima de producción y el canal privado para reportar vulnerabilidades se encuentran en [SECURITY.md](SECURITY.md).
