@@ -58,4 +58,19 @@ final class FilesystemNavigationTest extends TestCase
         self::assertSame(array(100, 60), array_slice(getimagesize($thumbnail), 0, 2));
         self::assertFileExists($image);
     }
+
+    public function testUnlimitedPhpMemoryDoesNotBlockThumbnailCreation(): void
+    {
+        $image = $this->fixture->createPng('documents/unlimited.png', 200, 120);
+        $previousLimit = ini_get('memory_limit');
+
+        try {
+            self::assertNotFalse(ini_set('memory_limit', '-1'));
+            self::assertTrue($this->fixture->browser()->createFixtureThumbnail($image));
+        } finally {
+            ini_set('memory_limit', (string) $previousLimit);
+        }
+
+        self::assertFileExists($this->fixture->thumbnailTypeDirectory() . '/documents/unlimited.png');
+    }
 }

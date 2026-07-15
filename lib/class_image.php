@@ -191,6 +191,7 @@ abstract class image
   final public function checkMemoryLimitOverload($val)
   {
     $memory_limit = ini_get('memory_limit');
+    if ($memory_limit === '-1') return false;
     if (preg_match('/^(\d+)(.)$/', $memory_limit, $matches)) {
       if ($matches[2] == 'M') {
         $memory_limit = $matches[1] * 1024 * 1024; // nnnM -> nnn MB
