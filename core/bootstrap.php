@@ -40,30 +40,30 @@ require "core/autoload.php";
 function validateCSRF($token): string | bool
 {
     // Verifica si el token existe en la sesión
-    if (!isset($_SESSION['kcCsrf'])) {
+    if (!isset($_SESSION['kcCsrf']) || !is_string($_SESSION['kcCsrf'])) {
         return 'CSRF token missing in session';
     }
 
-    if (empty($_SESSION['kcCsrf'])) {
+    if ($_SESSION['kcCsrf'] === '') {
         return 'CSRF token missing in session';
     }
 
     // Verifica el token dado por el frontend usuario
-    if (empty($token)) {
+    if (!is_string($token) || $token === '') {
         return 'CSRF token not provided';
     }
 
-    if (!isset($_COOKIE['kcCsrf'])) {
+    if (!isset($_COOKIE['kcCsrf']) || !is_string($_COOKIE['kcCsrf'])) {
         return 'Invalid or missing CSRF token';
     }
 
     // Verifica si el token proporcionado es válido
-    if (strcmp($_SESSION['kcCsrf'], $token) !== 0) {
+    if (!hash_equals($_SESSION['kcCsrf'], $token)) {
         return 'Invalid or missing CSRF token';
     }
 
     // Verifica el token en la cookie
-    if (strcmp($_SESSION['kcCsrf'], $_COOKIE['kcCsrf']) !== 0) {
+    if (!hash_equals($_SESSION['kcCsrf'], $_COOKIE['kcCsrf'])) {
         return 'Invalid CSRF token';
     }
 

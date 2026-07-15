@@ -26,8 +26,11 @@ final class CsrfValidationTest extends TestCase
         return array(
             'missing session token' => array(array(), array(), '', 'CSRF token missing in session'),
             'empty session token' => array(array('kcCsrf' => ''), array(), '', 'CSRF token missing in session'),
+            'array session token' => array(array('kcCsrf' => array('token')), array(), '', 'CSRF token missing in session'),
             'missing request token' => array(array('kcCsrf' => 'token'), array('kcCsrf' => 'token'), '', 'CSRF token not provided'),
+            'array request token' => array(array('kcCsrf' => 'token'), array('kcCsrf' => 'token'), array('token'), 'CSRF token not provided'),
             'missing cookie token' => array(array('kcCsrf' => 'token'), array(), 'token', 'Invalid or missing CSRF token'),
+            'array cookie token' => array(array('kcCsrf' => 'token'), array('kcCsrf' => array('token')), 'token', 'Invalid or missing CSRF token'),
             'different request token' => array(array('kcCsrf' => 'token'), array('kcCsrf' => 'token'), 'other', 'Invalid or missing CSRF token'),
             'different cookie token' => array(array('kcCsrf' => 'token'), array('kcCsrf' => 'other'), 'token', 'Invalid CSRF token'),
         );
@@ -37,7 +40,7 @@ final class CsrfValidationTest extends TestCase
     public function testInvalidCsrfStatesRetainTheirCurrentResponse(
         array $session,
         array $cookie,
-        string $requestToken,
+        mixed $requestToken,
         string $expected
     ): void {
         $_SESSION = $session;

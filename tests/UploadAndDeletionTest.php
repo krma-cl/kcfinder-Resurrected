@@ -53,6 +53,33 @@ final class UploadAndDeletionTest extends TestCase
         self::assertFileDoesNotExist($temporary);
     }
 
+    public function testMalformedMultiFileMetadataIsRejectedWithoutWarnings(): void
+    {
+        $result = $this->fixture->browser()->validateFixtureUpload(array(
+            'name' => array('report.txt'),
+            'tmp_name' => 'not-an-array',
+            'error' => array(UPLOAD_ERR_OK),
+        ));
+
+        self::assertSame('Invalid file upload.', $result);
+    }
+
+    public function testValidMultiFileMetadataKeepsLegacyValidationBehavior(): void
+    {
+        $first = $this->fixture->writeStagedFile('first document');
+        $second = $this->fixture->writeStagedFile('second document');
+
+        $result = $this->fixture->browser()->validateFixtureUpload(array(
+            'name' => array('first.txt', 'second.txt'),
+            'tmp_name' => array($first, $second),
+            'error' => array(UPLOAD_ERR_OK, UPLOAD_ERR_OK),
+        ));
+
+        self::assertTrue($result);
+        self::assertFileExists($first);
+        self::assertFileExists($second);
+    }
+
     public function testDeleteRemovesFileAndItsGeneratedThumbnail(): void
     {
         $file = $this->fixture->writeTypeFile('documents/delete.txt', 'delete me');

@@ -406,16 +406,32 @@ class uploader
         $config = &$this->config;
         $file = ($aFile === null) ? $this->file : $aFile;
 
-        if (!is_array($file) || !isset($file['name']))
+        if (!is_array($file) || !array_key_exists('name', $file))
             return $this->label("Unknown error");
 
         if (is_array($file['name'])) {
+            if (
+                !isset($file['tmp_name'], $file['error']) ||
+                !is_array($file['tmp_name']) ||
+                !is_array($file['error'])
+            ) {
+                return $this->label("Invalid file upload.");
+            }
+
             foreach ($file['name'] as $i => $name) {
+                if (
+                    !is_string($name) ||
+                    !array_key_exists($i, $file['tmp_name']) ||
+                    !array_key_exists($i, $file['error'])
+                ) {
+                    return $this->label("Invalid file upload.");
+                }
+
                 $return = $this->checkUploadedFile(array(
                     'name' => $name,
                     'tmp_name' => $file['tmp_name'][$i],
                     'error' => $file['error'][$i]
-                ));
+                ), $Check_isuploaded);
                 if ($return !== true) {
                     return "$name: $return";
                 }
@@ -424,7 +440,12 @@ class uploader
         }
 
         // Validación inicial del array de archivo
-        if (!is_array($file) || !isset($file['name'], $file['tmp_name'], $file['error'])) {
+        if (
+            !isset($file['name'], $file['tmp_name'], $file['error']) ||
+            !is_string($file['name']) ||
+            !is_string($file['tmp_name']) ||
+            !is_int($file['error'])
+        ) {
             return $this->label("Invalid file upload.");
         }
 
