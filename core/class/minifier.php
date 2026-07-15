@@ -79,7 +79,9 @@ class minifier
 
             if (strlen($this->minCmd) && (substr($file, 4, 1) != "_")) {
                 $cmd = str_replace("{file}", $file, $this->minCmd);
-                $source .= `$cmd`;
+                $output = shell_exec($cmd);
+                if (($output !== false) && ($output !== null))
+                    $source .= $output;
             } else
                 $source .= file_get_contents($file);
         }
