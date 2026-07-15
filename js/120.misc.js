@@ -83,6 +83,13 @@ _.getURL = function (act, lang) {
         url += "&act=" + encodeURIComponent(act);
     if (_.cms)
         url += "&cms=" + encodeURIComponent(_.cms);
+    if (_.selector && _.selector.enabled) {
+        url += "&selector=1";
+        if (_.selector.multiple)
+            url += "&selectorMultiple=1";
+        if (_.selector.targetOrigin)
+            url += "&selectorOrigin=" + encodeURIComponent(_.selector.targetOrigin);
+    }
     return url;
 };
 

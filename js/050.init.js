@@ -106,6 +106,18 @@ _.initOpeners = function () {
                 window.parent.KCFinder.callBackMultiple;
         }
 
+        if (_.selector.enabled) {
+            var selectorWindow = window.opener ||
+                ((window.parent && window.parent !== window) ? window.parent : null);
+
+            if (selectorWindow && selectorWindow.KCFinder) {
+                if ($.isFunction(selectorWindow.KCFinder.callBackObject))
+                    _.opener.callBackObject = selectorWindow.KCFinder.callBackObject;
+                if ($.isFunction(selectorWindow.KCFinder.callBackMultipleObjects))
+                    _.opener.callBackMultipleObjects = selectorWindow.KCFinder.callBackMultipleObjects;
+            }
+        }
+
     } catch (e) {}
 };
 

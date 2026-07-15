@@ -15,5 +15,11 @@ var _ = {
     shows: [],
     orders: [],
     cms: "",
+    selector: {
+        enabled: false,
+        multiple: false,
+        targetOrigin: null,
+        error: null
+    },
     scrollbarWidth: 20
 };

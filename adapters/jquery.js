@@ -23,7 +23,12 @@
                 type: "",
                 dir: "",
                 callback: false,
-                callbackMultiple: false
+                callbackMultiple: false,
+                selector: false,
+                selectorOrigin: "",
+                selectorMultiple: false,
+                callbackObject: false,
+                callbackMultipleObjects: false
             },
             ifr = $('<iframe></iframe>'),
 
@@ -39,6 +44,13 @@
             i = parse[i];
             if (o[i].length)
                 url += i + "=" + encodeURIComponent(o[i]) + "&";
+        }
+        if (o.selector || $.isFunction(o.callbackObject) || $.isFunction(o.callbackMultipleObjects)) {
+            url += "selector=1&";
+            if (o.selectorMultiple || $.isFunction(o.callbackMultipleObjects))
+                url += "selectorMultiple=1&";
+            if (typeof o.selectorOrigin === "string" && o.selectorOrigin.length)
+                url += "selectorOrigin=" + encodeURIComponent(o.selectorOrigin) + "&";
         }
         url = url.substring(0, url.length - 1);
 
@@ -56,21 +68,32 @@
         $(t).html(ifr);
 
         // Callbacks
-        if ($.isFunction(o.callback) || $.isFunction(o.callbackMultiple)) {
+        if ($.isFunction(o.callback) || $.isFunction(o.callbackMultiple) ||
+            $.isFunction(o.callbackObject) || $.isFunction(o.callbackMultipleObjects)) {
             if (!window.KCFinder)
                 window.KCFinder = {};
 
             // Single file callback
             if ($.isFunction(o.callback))
                 window.KCFinder.callBack = o.callback;
-            else if (window.KCFinder && window.KCFinder.callback)
-                delete window.KCFinder.callback;
+            else if (window.KCFinder && window.KCFinder.callBack)
+                delete window.KCFinder.callBack;
 
             // Multiple files callback
             if ($.isFunction(o.callbackMultiple))
                 window.KCFinder.callBackMultiple = o.callbackMultiple;
-            else if (window.KCFinder && window.KCFinder.callbackMultiple)
-                delete window.KCFinder.callbackMultiple;
+            else if (window.KCFinder && window.KCFinder.callBackMultiple)
+                delete window.KCFinder.callBackMultiple;
+
+            if ($.isFunction(o.callbackObject))
+                window.KCFinder.callBackObject = o.callbackObject;
+            else if (window.KCFinder && window.KCFinder.callBackObject)
+                delete window.KCFinder.callBackObject;
+
+            if ($.isFunction(o.callbackMultipleObjects))
+                window.KCFinder.callBackMultipleObjects = o.callbackMultipleObjects;
+            else if (window.KCFinder && window.KCFinder.callBackMultipleObjects)
+                delete window.KCFinder.callBackMultipleObjects;
 
         // No callbacks
         } else if (window.KCFinder)

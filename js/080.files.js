@@ -167,6 +167,11 @@ _.selectAll = function (e) {
 
 _.returnFile = function (file) {
 
+    if (_.selector.enabled && !file.substr) {
+        _.returnModernFiles([file], false);
+        return;
+    }
+
     var button, win, fileURL = file.substr ?
         file : _.uploadURL + "/" + _.dir + "/" + file.data('name');
     fileURL = $.$.escapeDirs(fileURL);
@@ -226,10 +231,83 @@ _.returnFile = function (file) {
     }
 };
 
+_.hasLegacySelector = function () {
+    return !!(_.opener.callBack || _.opener.callBackMultiple);
+};
+
+_.hasModernSelector = function () {
+    return !!(_.selector && _.selector.enabled && _.selector.targetOrigin);
+};
+
+_.hasFileSelector = function () {
+    return _.hasLegacySelector() || _.hasModernSelector();
+};
+
+_.supportsMultipleSelection = function () {
+    return !!(_.opener.callBackMultiple || (_.hasModernSelector() && _.selector.multiple));
+};
+
+_.returnModernFiles = function (files, multiple) {
+    var names = [];
+
+    $.each(files, function (i, file) {
+        names.push($(file).data('name'));
+    });
+
+    if (!names.length)
+        return;
+
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        url: _.getURL("select"),
+        data: {
+            csrf_token: csrfToken,
+            dir: _.dir,
+            files: names,
+            multiple: multiple ? "1" : "0"
+        },
+        success: function (data) {
+            if (!data || data.version !== 1 || data.error) {
+                _.alert(data && data.error ? data.error.message : _.label("Unknown error."));
+                return;
+            }
+
+            _.deliverModernSelection(data);
+        },
+        error: function () {
+            _.alert(_.label("Unknown error."));
+        }
+    });
+};
+
+_.deliverModernSelection = function (data) {
+    var target = window.opener ||
+        ((window.parent && window.parent !== window) ? window.parent : null);
+
+    try {
+        if (data.event === "kcfinder:file-selected" && $.isFunction(_.opener.callBackObject))
+            _.opener.callBackObject(data.file);
+        else if (data.event === "kcfinder:files-selected" && $.isFunction(_.opener.callBackMultipleObjects))
+            _.opener.callBackMultipleObjects(data.files);
+    } catch (e) {}
+
+    if (target && _.selector.targetOrigin)
+        target.postMessage(data, _.selector.targetOrigin);
+
+    if (window.opener)
+        window.close();
+};
+
 /**
  * Retorna el archivo para ser usado por ajax 
  */
 _.returnFiles = function (files) {
+    if (_.selector.enabled && files.length) {
+        _.returnModernFiles(files, true);
+        return;
+    }
+
     if (_.opener.callBackMultiple && files.length) {
         var rfiles = [];
         $.each(files, function (i, file) {

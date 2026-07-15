@@ -88,7 +88,7 @@ _.menuFile = function (file, e) {
             if (!data.writable) notWritable++;
         });
 
-        if (_.opener.callBackMultiple) {
+        if (_.supportsMultipleSelection()) {
 
             // SELECT FILES
             _.menu.addItem("kcact:pick", _.label("Select"), function () {
@@ -97,7 +97,7 @@ _.menuFile = function (file, e) {
             });
 
             // SELECT THUMBNAILS
-            if (thumb)
+            if (thumb && _.opener.callBackMultiple)
                 _.menu.addItem("kcact:pick_thumb", _.label("Select Thumbnails"), function () {
                     _.returnThumbnails(files);
                     return false;
@@ -230,7 +230,7 @@ _.menuFile = function (file, e) {
         file.addClass('selected');
         $('#fileinfo').text(data.name + " (" + _.humanSize(data.size) + ", " + data.date + ")");
 
-        if (_.opener.callBack || _.opener.callBackMultiple) {
+        if (_.hasFileSelector()) {
 
             // SELECT FILE
             _.menu.addItem("kcact:pick", _.label("Select"), function () {
@@ -239,7 +239,7 @@ _.menuFile = function (file, e) {
             });
 
             // SELECT THUMBNAIL
-            if (data.thumb)
+            if (data.thumb && _.hasLegacySelector())
                 _.menu.addItem("kcact:pick_thumb", _.label("Select Thumbnail"), function () {
                     _.returnFile(_.thumbsURL + "/" + _.dir + "/" + data.name);
                     return false;
