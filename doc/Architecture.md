@@ -147,6 +147,8 @@ Semántica:
 
 El objeto podrá crecer de forma compatible con propiedades opcionales. La eliminación o reinterpretación de propiedades requerirá una nueva versión del contrato.
 
+La implementación inicial y su uso independiente de los endpoints heredados se documentan en [FileMetadataContract.md](FileMetadataContract.md).
+
 ### 7.2 Canales de entrega
 
 Se conservarán los callbacks heredados y se agregarán:
