@@ -1,81 +1,140 @@
-# KCFinder Resurrected Ajax & PHP web file manager 
+# KCFinder Resurrected
 
-### Ultima Version 4.0 01/04/2025
-#### Changelog
-4.00-test1: 2025-04-01
-* Agregado CSRF Token a todos los endpoint de core/browser.php
-* Agregado CSRF Token a core/uploader.php
-* Algunos problemas de seguridad importantes resueltos
-* Agregado editor de imágenes subidas Filerobot
-* Mejoras en verificación de archivos subidos
-* JQuery actualizado a v3.7.1
-* Agregado ejemplo de para la nueva integración (index.php)
-* Mejoras en dragupload desde sitios externos
-* Múltiples mejoras de código
-* Eliminación de código obsoleto JS y referencias a navegadores descontinuados
+> A maintained, security-focused and production-oriented continuation of KCFinder, preserving backward compatibility and lightweight deployment.
 
-### Description
-KCFinder Resurrected, es la continuación del proyecto original kcfinder (https://github.com/sunhater/kcfinder) creado por Pavel Tzonkov, el cual esta sin soporte ni desarrollo desde Sep 2014, KCFinder Resurrected fue actualizado a la ultima version de jQuery y jQuery UI, se corrigieron algunos errores de seguridad críticos y se agregaron nuevas características como el poder recortar imágenes ya subidas desde el menu con Jcrop, ademas de contar con mejor soporte para versiones actuales de php y una renovación de la interfaz.
+[![CI](https://github.com/krma-cl/kcfinder-Resurrected/actions/workflows/ci.yml/badge.svg)](https://github.com/krma-cl/kcfinder-Resurrected/actions/workflows/ci.yml)
+[![Packagist](https://img.shields.io/packagist/v/krma-cl/kcfinder)](https://packagist.org/packages/krma-cl/kcfinder)
+[![PHP](https://img.shields.io/packagist/dependency-v/krma-cl/kcfinder/php)](https://packagist.org/packages/krma-cl/kcfinder)
+[![License](https://img.shields.io/packagist/l/krma-cl/kcfinder)](doc/LICENSE.GPL)
 
-## Overview
-KCFinder es un reemplazo gratuito de código abierto del administrador de archivos web CKFinder. Se puede integrar en los editores web CKEditor y TinyMCE WYSIWYG (o sus aplicaciones web personalizadas) para cargar y administrar imágenes y otros archivos que se pueden incrustar en el contenido HTML generado por un editor.
+KCFinder Resurrected es la continuación mantenida del administrador de archivos web creado originalmente por Pavel Tzonkov. El proyecto conserva la instalación sencilla y los flujos conocidos de KCFinder, mientras incorpora compatibilidad con PHP moderno, pruebas automatizadas, mejoras de seguridad y contratos preparados para aplicaciones actuales.
 
-## Licenses
-* GNU General Public License, version 3
-* GNU Lesser General Public License, version 3
+No es un parche temporal del repositorio histórico: es una línea de continuidad con identidad, releases y hoja de ruta propias. Reconocemos y preservamos explícitamente el trabajo original de [`sunhater/kcfinder`](https://github.com/sunhater/kcfinder).
 
-#### Credits
-Original project by Pavel Tzonkov https://github.com/sunhater/kcfinder
-Editor de imágenes Filerobot https://scaleflex.github.io/filerobot-image-editor/
+## Estado del proyecto
 
-## Features
-* Edición de imágenes Subidas con Filerobot 
-* Recorte rápido de imágenes Subidas con Jcrop
-* Jquery y Jquery Ui en su ultima Version (jQuery v3.7.1  y  jQuery UI v1.13.2)
-* Motor Ajax con respuestas JSON 
-* Carga de varios archivos 
-* Cargar archivos usando HTML5 arrastrar y soltar desde el administrador de archivos local 
-* Arrastre y suelte imágenes desde páginas HTML externas. Se pueden eliminar varias imágenes usando la selección (solo Firefox) 
-* Descargar varios archivos o una carpeta como un solo archivo ZIP 
-* Seleccione varios archivos con la tecla Ctrl / Comando 
-* Portapapeles para copiar, mover y descargar múltiples archivos 
-* Fácil de integrar y configurar en aplicaciones web 
-* Opción para seleccionar y devolver varios archivos. Solo para aplicaciones personalizadas 
-* Cambiar el tamaño de las imágenes cargadas. Resolución de imagen máxima configurable 
-* Soporte de marca de agua PNG * Resolución de miniaturas configurable 
-* Rotar y / o voltear automáticamente las imágenes cargadas dependiendo de la etiqueta EXIF de información de orientación si existe 
-* Soporte de múltiples temas 
-* Soporta varios idiomas
-* Vista previa de imágenes en tamaño completo
+- Versión publicada: [`v4.3.0-rc.1`](https://github.com/krma-cl/kcfinder-Resurrected/releases/tag/v4.3.0-rc.1).
+- Paquete Composer: [`krma-cl/kcfinder`](https://packagist.org/packages/krma-cl/kcfinder).
+- Compatibilidad mantenida: PHP 8.2, 8.3, 8.4 y 8.5.
+- Distribución tradicional mediante ZIP autosuficiente.
+- Matriz continua de sintaxis, PHPUnit, PHPStan y validación de artefactos.
+- Selector moderno JSON opt-in, sin retirar el selector heredado.
 
-## Compatibility
-* KCFinder se prueba oficialmente en el servidor web Apache 2.4 solamente, pero probablemente funcionará en otros servidores web.
-* Se requiere PHP 8.2 o superior. La matriz mantenida comprende PHP 8.2, 8.3, 8.4 y 8.5.
-* Se requiere al menos una de estas extensiones de PHP: GD, ImageMagick o GraphicsMagick. 
-* Para trabajar con caché HTTP del lado del cliente, el PHP debe instalarse como módulo Apache. 
-* KCFinder soporta el reconocimiento de tipo MIME para los archivos cargados. Si planea usar esta función, debe cargar la extensión Fileinfo PHP. 
-* La extensión PHP ZIP debe cargarse para tener la opción de descargar múltiples archivos y directorios como un solo archivo ZIP. 
-* La rotación automática y volteo de imágenes requiere la extensión PHP EXIF.
+La serie `4.3` se encuentra actualmente en fase de *release candidate*. La interfaz responsiva y los adaptadores oficiales para Laravel y Symfony forman parte de las siguientes etapas de la hoja de ruta.
+
+## Qué es KCFinder
+
+KCFinder es un administrador de archivos web de código abierto que puede integrarse con CKEditor, TinyMCE y aplicaciones personalizadas. Permite navegar carpetas, subir y administrar archivos, crear miniaturas, editar imágenes y seleccionar recursos para incorporarlos en otros sistemas.
+
+## Características
+
+- Navegación de carpetas y operaciones AJAX.
+- Carga múltiple mediante selector, arrastrar y soltar y fuentes externas.
+- Miniaturas, redimensionado, rotación EXIF y marcas de agua.
+- Edición de imágenes mediante Filerobot y recorte rápido con Jcrop.
+- Descarga de archivos y carpetas como ZIP.
+- Copia, movimiento, renombrado y eliminación según permisos configurados.
+- Selección simple o múltiple para integraciones personalizadas.
+- Respuesta JSON versionada con nombre, ruta, URL, MIME y tamaño.
+- Sesiones y protección CSRF.
+- Reconocimiento MIME mediante Fileinfo.
+- Soporte para múltiples idiomas y temas.
+- Tema Bootstrap 5 desacoplado y opcional.
+
+## Instalación
+
+### ZIP tradicional
+
+Descargue el ZIP y su suma SHA-256 desde [GitHub Releases](https://github.com/krma-cl/kcfinder-Resurrected/releases). Este canal no requiere Composer, Node.js ni Docker en el servidor.
+
+Las instrucciones completas se encuentran en [doc/Distribution.md](doc/Distribution.md).
+
+### Composer
+
+Mientras la versión disponible sea un *release candidate*:
+
+```bash
+composer require krma-cl/kcfinder:^4.3@RC
+```
+
+Composer instala el paquete en `vendor/krma-cl/kcfinder` y expone el namespace moderno `KCFinder\` mediante PSR-4. No publique el directorio `vendor` completo como raíz web; para la interfaz independiente utilice el ZIP tradicional o una publicación controlada de recursos.
+
+## Selector moderno
+
+El selector estructurado puede entregar un objeto versionado como el siguiente:
+
+```json
+{
+  "name": "DO-20130614.pdf",
+  "path": "/01-actos/diario-oficial/2013/DO-20130614.pdf",
+  "url": "/storage/transparencia/01-actos/diario-oficial/2013/DO-20130614.pdf",
+  "mime": "application/pdf",
+  "size": 184320
+}
+```
+
+La activación es opt-in y mantiene la compatibilidad con callbacks heredados. Los callbacks estructurados y el uso seguro de `postMessage` están documentados en [doc/ModernSelector.md](doc/ModernSelector.md).
+
+## Requisitos
+
+- PHP 8.2 o superior dentro de la matriz mantenida.
+- Apache 2.4 como servidor probado oficialmente; otros servidores pueden funcionar con configuración equivalente.
+- Fileinfo e Intl.
+- GD, Imagick o GraphicsMagick para imágenes y miniaturas.
+- mbstring recomendada para nombres Unicode.
+- EXIF para orientación automática.
+- ZIP para descargas agrupadas.
+
+## Seguridad
+
+KCFinder administra uploads y operaciones de sistema de archivos, por lo que debe ejecutarse detrás de autenticación y autorización adecuadas. Revise [SECURITY.md](SECURITY.md) antes de habilitarlo públicamente y utilice el canal privado de GitHub para informar vulnerabilidades.
+
+La configuración segura, CSRF, validación de tipos, rutas y sesiones cuentan con pruebas automatizadas. No se ocultan warnings ni deprecations para conseguir que la suite pase.
 
 ## Desarrollo
-
-Composer es una herramienta de desarrollo y un canal opcional de instalación; la distribución tradicional continúa funcionando sin ejecutarlo en producción.
 
 ```bash
 composer install
 composer test
 ```
 
-`composer test` valida sintaxis, ejecuta PHPUnit y analiza el núcleo con PHPStan. El entorno de desarrollo debe disponer de GD, Fileinfo, ZIP, EXIF, mbstring e Intl.
+`composer test` valida sintaxis, ejecuta PHPUnit y analiza el código moderno con PHPStan. El pipeline repite estas verificaciones en PHP 8.2, 8.3, 8.4 y 8.5.
+
+Para construir y verificar localmente los dos formatos de distribución:
+
+```bash
+composer package
+php tools/verify-composer-install.php
+```
 
 ## Arquitectura y hoja de ruta
 
-La dirección de la edición mantenida, segura y preparada para producción se documenta en [doc/Architecture.md](doc/Architecture.md). El documento define los principios de compatibilidad, el selector JSON, la distribución mediante Composer, los adaptadores para Laravel y Symfony y la experiencia responsiva.
+La dirección del proyecto está documentada en [doc/Architecture.md](doc/Architecture.md). La hoja de ruta conserva un núcleo independiente y contempla:
 
-La superficie HTTP, acciones AJAX y formatos heredados protegidos por las pruebas de caracterización se encuentran en [doc/PublicSurface.md](doc/PublicSurface.md).
+1. Compatibilidad y pruebas de caracterización.
+2. Seguridad y configuración de producción.
+3. Servicios y contratos desacoplados.
+4. Selector JSON moderno.
+5. Composer, Packagist y releases reproducibles.
+6. Interfaz responsiva y accesible.
+7. Adaptadores oficiales para Laravel y Symfony.
 
-El selector JSON opt-in, sus callbacks estructurados y la configuración segura de `postMessage` se documentan en [doc/ModernSelector.md](doc/ModernSelector.md).
+La superficie HTTP y los comportamientos heredados protegidos por pruebas se describen en [doc/PublicSurface.md](doc/PublicSurface.md). Las decisiones arquitectónicas relevantes se registran en [`doc/adr`](doc/adr).
 
-Las dos formas de instalación, ZIP tradicional y paquete Composer `krma-cl/kcfinder`, se describen en [doc/Distribution.md](doc/Distribution.md). El procedimiento de publicación para mantenedores está en [doc/Releasing.md](doc/Releasing.md).
+## Linaje y agradecimientos
 
-La configuración mínima de producción y el canal privado para reportar vulnerabilidades se encuentran en [SECURITY.md](SECURITY.md).
+- KCFinder original, creado por [Pavel Tzonkov](https://github.com/sunhater).
+- Continuación previa de [DevCrh/KCFinder Resurrected](https://github.com/DevCrh/kcfinder-Resurrected).
+- Editor de imágenes [Filerobot Image Editor](https://scaleflex.github.io/filerobot-image-editor/).
+- Todas las personas que han contribuido, probado y reportado problemas durante la vida del proyecto.
+
+KCFinder Resurrected mantiene su linaje visible porque la continuidad del software libre se construye sobre el trabajo anterior, no borrándolo.
+
+## Licencias
+
+El proyecto continúa disponible bajo:
+
+- GNU General Public License, versión 3 o posterior.
+- GNU Lesser General Public License, versión 3 o posterior.
+
+Consulte las licencias completas [GPL](doc/LICENSE.GPL) y [LGPL](doc/LICENSE.LGPL).
