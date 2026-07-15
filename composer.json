@@ -1,13 +1,45 @@
 {
-    "name": "devcrh/kcfinder-resurrected",
+    "name": "krma-cl/kcfinder",
     "description": "A maintained, security-focused continuation of KCFinder for modern production environments",
-    "type": "project",
+    "type": "library",
+    "keywords": [
+        "file-manager",
+        "file-uploader",
+        "kcfinder",
+        "laravel",
+        "symfony"
+    ],
+    "homepage": "https://github.com/krma-cl/kcfinder-Resurrected",
     "license": [
         "GPL-3.0-or-later",
         "LGPL-3.0-or-later"
     ],
+    "authors": [
+        {
+            "name": "Pavel Tzonkov",
+            "role": "Original KCFinder author"
+        },
+        {
+            "name": "KCFinder Resurrected contributors",
+            "homepage": "https://github.com/krma-cl/kcfinder-Resurrected/graphs/contributors"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/krma-cl/kcfinder-Resurrected/issues",
+        "security": "https://github.com/krma-cl/kcfinder-Resurrected/security/advisories/new",
+        "source": "https://github.com/krma-cl/kcfinder-Resurrected"
+    },
     "require": {
-        "php": "^8.2"
+        "php": "^8.2",
+        "ext-fileinfo": "*",
+        "ext-intl": "*"
+    },
+    "suggest": {
+        "ext-exif": "Reads image orientation metadata before image transformations.",
+        "ext-gd": "Provides the default image and thumbnail driver.",
+        "ext-imagick": "Provides an optional image and thumbnail driver.",
+        "ext-mbstring": "Improves Unicode-aware filename sorting.",
+        "ext-zip": "Enables ZIP downloads of files and directories."
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
@@ -26,10 +58,40 @@
             "@lint",
             "@phpunit",
             "@phpstan"
+        ],
+        "package": [
+            "@php tools/build-release.php --version=4.3.0-dev",
+            "@php tools/verify-release.php dist/kcfinder-resurrected-4.3.0-dev.zip",
+            "@composer archive --format=zip --dir=dist/composer --file=kcfinder-composer",
+            "@php tools/verify-composer-archive.php dist/composer/kcfinder-composer.zip"
         ]
     },
     "config": {
         "allow-plugins": {},
         "sort-packages": true
+    },
+    "archive": {
+        "exclude": [
+            "/.dockerignore",
+            "/.env.example",
+            "/.github",
+            "/.gitignore",
+            "/.gitattributes",
+            "/.phpunit.cache",
+            "/Dockerfile",
+            "/compose.yaml",
+            "/docker",
+            "/dist",
+            "/vendor",
+            "/upload",
+            "/cache/*.css",
+            "/cache/*.js",
+            "/tests",
+            "/test",
+            "/tools",
+            "/phpunit.xml.dist",
+            "/phpstan.neon",
+            "/composer.lock"
+        ]
     }
 }

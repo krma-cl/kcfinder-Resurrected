@@ -10,3 +10,4 @@ cache/*
 /.phpunit.result.cache
 /tmp/
 /vendor/
+/dist/

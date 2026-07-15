@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - '**'
   pull_request:
 
 permissions:
@@ -41,3 +43,51 @@ jobs:
 
       - name: Run quality suite
         run: composer test
+
+  package:
+    name: Verify distributions
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.5'
+          extensions: exif, fileinfo, gd, intl, mbstring, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Install development dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Build reproducible traditional archives
+        run: |
+          php tools/build-release.php --version=4.3.0-ci --output-dir=dist/first
+          php tools/build-release.php --version=4.3.0-ci --output-dir=dist/second
+          cmp dist/first/kcfinder-resurrected-4.3.0-ci.zip dist/second/kcfinder-resurrected-4.3.0-ci.zip
+
+      - name: Verify traditional and Composer installations
+        run: |
+          php tools/verify-release.php dist/first/kcfinder-resurrected-4.3.0-ci.zip
+          php tools/verify-composer-install.php
+          composer archive --format=zip --dir=dist/composer --file=kcfinder-composer
+          php tools/verify-composer-archive.php dist/composer/kcfinder-composer.zip
+
+      - name: Prepare CI artifact
+        run: |
+          mkdir -p dist/artifact
+          cp dist/first/kcfinder-resurrected-4.3.0-ci.zip* dist/artifact/
+
+      - name: Upload verified archive
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kcfinder-traditional-php-8.5
+          path: dist/artifact/
+          if-no-files-found: error

@@ -1,0 +1,102 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-tag:
+    name: Validate tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require semantic version
+        shell: bash
+        run: |
+          if [[ ! "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
+            echo "Release tags must follow vX.Y.Z or vX.Y.Z-suffix." >&2
+            exit 1
+          fi
+
+  quality:
+    name: PHP ${{ matrix.php-version }}
+    needs: validate-tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.2', '8.3', '8.4', '8.5']
+
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: exif, fileinfo, gd, intl, mbstring, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate tagged source
+        run: |
+          composer validate --strict
+          composer install --no-interaction --no-progress --prefer-dist
+          composer audit --locked --no-interaction
+          composer test
+
+  publish:
+    name: Build and publish artifacts
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.5'
+          extensions: exif, fileinfo, gd, intl, mbstring, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Install development dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Build and verify release twice
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          php tools/build-release.php --version="$VERSION" --output-dir=dist/first
+          php tools/build-release.php --version="$VERSION" --output-dir=dist/second
+          cmp "dist/first/kcfinder-resurrected-$VERSION.zip" "dist/second/kcfinder-resurrected-$VERSION.zip"
+          php tools/verify-release.php "dist/first/kcfinder-resurrected-$VERSION.zip"
+          php tools/verify-composer-install.php
+          composer archive --format=zip --dir=dist/composer --file=kcfinder-composer
+          php tools/verify-composer-archive.php dist/composer/kcfinder-composer.zip
+          mkdir -p dist/release
+          cp "dist/first/kcfinder-resurrected-$VERSION.zip"* dist/release/
+
+      - name: Publish GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          OPTIONS=(--repo "$GITHUB_REPOSITORY" --title "KCFinder Resurrected ${GITHUB_REF_NAME}" --generate-notes)
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            OPTIONS+=(--prerelease)
+          fi
+          gh release create "$GITHUB_REF_NAME" dist/release/* "${OPTIONS[@]}"

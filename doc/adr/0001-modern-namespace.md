@@ -17,7 +17,7 @@ El código nuevo necesita autoload estándar para ser consumido mediante Compose
 - Las clases heredadas conservarán sus nombres y su autoloader actual durante la ruta de compatibilidad.
 - El primer valor compartido será `KCFinder\Domain\FileDescriptor`, que representa el contrato versionado de archivo seleccionado.
 - Los servicios nuevos dependerán de contratos pequeños, como `UrlResolverInterface`, en vez de leer directamente variables globales o configuración de frameworks.
-- El nombre definitivo de Packagist se decidirá por separado; este ADR no cambia todavía `composer.json#name`.
+- El nombre de Packagist se decide por separado en el ADR 0004; este ADR no altera la decisión de conservar `KCFinder\` como namespace moderno.
 
 ## Consecuencias
 

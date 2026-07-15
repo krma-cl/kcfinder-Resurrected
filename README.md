@@ -59,7 +59,7 @@ Editor de imágenes Filerobot https://scaleflex.github.io/filerobot-image-editor
 
 ## Desarrollo
 
-Composer es una herramienta de desarrollo y una futura alternativa de instalación; la distribución tradicional continuará funcionando sin ejecutarlo en producción.
+Composer es una herramienta de desarrollo y un canal opcional de instalación; la distribución tradicional continúa funcionando sin ejecutarlo en producción.
 
 ```bash
 composer install
@@ -75,5 +75,7 @@ La dirección de la edición mantenida, segura y preparada para producción se d
 La superficie HTTP, acciones AJAX y formatos heredados protegidos por las pruebas de caracterización se encuentran en [doc/PublicSurface.md](doc/PublicSurface.md).
 
 El selector JSON opt-in, sus callbacks estructurados y la configuración segura de `postMessage` se documentan en [doc/ModernSelector.md](doc/ModernSelector.md).
+
+Las dos formas de instalación, ZIP tradicional y paquete Composer `krma-cl/kcfinder`, se describen en [doc/Distribution.md](doc/Distribution.md). El procedimiento de publicación para mantenedores está en [doc/Releasing.md](doc/Releasing.md).
 
 La configuración mínima de producción y el canal privado para reportar vulnerabilidades se encuentran en [SECURITY.md](SECURITY.md).

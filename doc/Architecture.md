@@ -208,9 +208,9 @@ El repositorio mantendrá dos formas oficiales de instalación:
 - Dependencias de producción mínimas.
 - Herramientas de pruebas y análisis sólo en `require-dev`.
 - Scripts reproducibles de validación y construcción.
-- Publicación en Packagist desde tags firmes del repositorio.
+- Publicación de `krma-cl/kcfinder` en Packagist desde tags firmes del repositorio.
 
-El nombre definitivo del paquete, el namespace PHP y la política de inclusión de recursos se aprobarán mediante un ADR antes de publicarlo.
+La identidad del paquete, el namespace PHP y los canales de artefactos están definidos en los ADR 0001 y 0004.
 
 ## 10. Integración con Laravel
 
@@ -372,15 +372,12 @@ El objetivo de este documento se considerará cumplido cuando exista evidencia d
 
 Cada decisión con impacto público debe registrarse como un ADR corto antes de implementarse. Las primeras decisiones pendientes son:
 
-1. Nombre del paquete Packagist y namespace PHP.
-2. Forma de compatibilizar el cargador heredado con PSR-4.
-3. Modelo definitivo de errores y excepciones públicas.
-4. API de streams y archivos grandes.
-5. Contrato de selección múltiple.
-6. Política y alcance de Flysystem.
-7. Compatibilidad inicial de versiones de Laravel y Symfony.
-8. Política de URLs públicas, temporales y firmadas.
-9. Separación exacta entre assets del núcleo y temas.
+1. Modelo definitivo de errores y excepciones públicas.
+2. API de streams y archivos grandes.
+3. Política y alcance de Flysystem.
+4. Compatibilidad inicial de versiones de Laravel y Symfony.
+5. Política de URLs públicas, temporales y firmadas.
+6. Separación exacta entre assets del núcleo y temas.
 
 ## 20. Regla para aceptar cambios
 
