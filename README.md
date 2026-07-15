@@ -172,6 +172,10 @@ La superficie HTTP y los comportamientos heredados protegidos por pruebas se des
 
 KCFinder Resurrected mantiene su linaje visible porque la continuidad del software libre se construye sobre el trabajo anterior, no borrándolo.
 
+## Mantenimiento y comunidad
+
+KCFinder Resurrected es mantenido por [KRMA](https://krma.cl) junto con su comunidad de usuarios y colaboradores. KRMA aporta desarrollo, coordinación e infraestructura para asegurar la continuidad del proyecto.
+
 ## Licencias
 
 El proyecto continúa disponible bajo:
