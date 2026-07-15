@@ -20,6 +20,8 @@ _.initFolders = function () {
     });
     $('div.folder > a > span.folder').unbind().click(function () {
         _.changeDir($(this).parent());
+        if (_.isNarrowViewport())
+            _.closeFolders(true);
     }).rightClick(function (el, e) {
         _.menuDir($(el).parent(), e);
     });

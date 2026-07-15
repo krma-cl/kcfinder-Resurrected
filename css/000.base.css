@@ -26,6 +26,11 @@ table {
     width: 25%;
 }
 
+#folderToggle,
+#foldersBackdrop {
+    display: none;
+}
+
 #right {
     float: left;
     display: block;
@@ -200,4 +205,118 @@ span.brace.opened, span.brace.closed {
 #lang {
     opacity: 0;
     filter: alpha(opacity=0);
+}
+
+@media (max-width: 767.98px) {
+    #left {
+        box-sizing: border-box;
+        position: fixed;
+        z-index: 1001;
+        top: 0;
+        left: 0;
+        float: none;
+        max-width: 320px;
+        background: #fff;
+        transform: translateX(-105%);
+        transition: transform .2s ease;
+    }
+
+    body.folders-drawer-open #left {
+        transform: translateX(0);
+    }
+
+    #foldersBackdrop {
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        background: rgba(0, 0, 0, .35);
+    }
+
+    body.folders-drawer-open #foldersBackdrop {
+        display: block;
+    }
+
+    #right {
+        float: none;
+    }
+
+    #resizer {
+        display: none;
+    }
+
+    #folderToggle {
+        box-sizing: border-box;
+        display: inline-block;
+        min-width: 44px;
+        min-height: 44px;
+        cursor: pointer;
+    }
+
+    #toolbar {
+        box-sizing: border-box;
+        white-space: normal;
+    }
+
+    #toolbar > div {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    #toolbar a {
+        box-sizing: border-box;
+        min-height: 44px;
+    }
+
+    #settings {
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    #settings > div,
+    #settings fieldset,
+    #settings table,
+    #settings tbody {
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    #settings table,
+    #settings tbody {
+        display: block;
+    }
+
+    #settings tr {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    #status {
+        box-sizing: content-box;
+        max-width: 100%;
+    }
+
+    #files table td.dimensions {
+        display: none;
+    }
+
+    .ui-dialog {
+        box-sizing: border-box;
+        max-width: calc(100vw - 16px);
+        max-height: calc(100vh - 16px);
+    }
+}
+
+@media (max-width: 479.98px) {
+    #files table td.time {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #left {
+        transition: none;
+    }
 }

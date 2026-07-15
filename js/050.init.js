@@ -19,6 +19,7 @@ _.init = function () {
     _.initSettings();
     _.initContent();
     _.initToolbar();
+    _.initResponsive();
     _.initResizer();
     _.initDropUpload();
 
@@ -50,6 +51,105 @@ _.init = function () {
 
     if ($.mobile)
         $('body').addClass("mobile");
+};
+
+_.isNarrowViewport = function () {
+    return window.innerWidth < 768;
+};
+
+_.closeFolders = function (returnFocus) {
+    var toggle = $('#folderToggle');
+
+    $('body').removeClass('folders-drawer-open');
+    toggle.attr('aria-expanded', 'false');
+
+    if (_.isNarrowViewport())
+        $('#left').attr('aria-hidden', 'true');
+
+    if (returnFocus && toggle.is(':visible'))
+        toggle.get(0).focus();
+};
+
+_.openFolders = function () {
+    var current;
+
+    if (!_.isNarrowViewport())
+        return;
+
+    $('body').addClass('folders-drawer-open');
+    $('#folderToggle').attr('aria-expanded', 'true');
+    $('#left').attr('aria-hidden', 'false');
+
+    current = $('#left a:visible').filter(function () {
+        return $(this).find('span.current').length > 0;
+    }).first();
+    if (!current.length)
+        current = $('#left a:visible').first();
+    if (current.length)
+        current.get(0).focus();
+};
+
+_.syncResponsiveState = function () {
+    var narrow = _.isNarrowViewport();
+
+    $('body').toggleClass('narrow-viewport', narrow);
+    $('#folderToggle').attr('aria-hidden', narrow ? 'false' : 'true');
+    if (narrow) {
+        if (!$('body').hasClass('folders-drawer-open'))
+            $('#left').attr('aria-hidden', 'true');
+    } else {
+        _.closeFolders(false);
+        $('#left').removeAttr('aria-hidden');
+    }
+};
+
+_.initResponsive = function () {
+    $('#folderToggle').off('.kcfResponsive').on('click.kcfResponsive', function (event) {
+        event.preventDefault();
+        if ($('body').hasClass('folders-drawer-open'))
+            _.closeFolders(true);
+        else
+            _.openFolders();
+    });
+
+    $('#foldersBackdrop').off('.kcfResponsive').on('click.kcfResponsive', function () {
+        _.closeFolders(true);
+    });
+
+    if (_.responsiveKeydownHandler)
+        document.removeEventListener('keydown', _.responsiveKeydownHandler, true);
+    _.responsiveKeydownHandler = function (event) {
+        var focusable, first, last;
+
+        if (!_.isNarrowViewport() || !$('body').hasClass('folders-drawer-open'))
+            return;
+        if (event.key === 'Escape' || event.keyCode === 27) {
+            event.preventDefault();
+            _.closeFolders(true);
+            return;
+        }
+        if (event.key !== 'Tab' && event.keyCode !== 9)
+            return;
+
+        focusable = $('#left').find('a:visible, button:visible, input:visible, select:visible, [tabindex]:visible')
+            .filter('[tabindex!="-1"]');
+        if (!focusable.length) {
+            event.preventDefault();
+            return;
+        }
+        first = focusable.first().get(0);
+        last = focusable.last().get(0);
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    };
+    document.addEventListener('keydown', _.responsiveKeydownHandler, true);
+
+    _.syncResponsiveState();
 };
 
 _.initOpeners = function () {
@@ -212,26 +312,41 @@ _.resize = function () {
         jResizer = $('#resizer'),
         jWindow = $(window);
 
-    jLeft.css({
-        width: "25%",
-        height: jWindow.height() - jStatus.outerHeight()
-    });
-    jRight.css({
-        width: "75%",
-        height: jWindow.height() - jStatus.outerHeight()
-    });
-    $('#toolbar').css('height', $('#toolbar a').outerHeight());
+    _.syncResponsiveState();
+
+    if (_.isNarrowViewport()) {
+        jLeft.css({
+            width: Math.min(jWindow.width() * 0.85, 320),
+            height: jWindow.height()
+        });
+        jRight.css({
+            width: "100%",
+            height: jWindow.height() - jStatus.outerHeight()
+        });
+        $('#toolbar').css('height', 'auto');
+    } else {
+        jLeft.css({
+            width: "25%",
+            height: jWindow.height() - jStatus.outerHeight()
+        });
+        jRight.css({
+            width: "75%",
+            height: jWindow.height() - jStatus.outerHeight()
+        });
+        $('#toolbar').css('height', $('#toolbar a').outerHeight());
+    }
 
     jResizer.css('height', $(window).height());
 
     jFolders.css('height', jLeft.outerHeight() - jFolders.outerVSpace());
     _.fixFilesHeight();
-    jStatus.css('width', jLeft.outerWidth() + jRight.outerWidth() - jStatus.outerHSpace('p'));
+    jStatus.css('width', (_.isNarrowViewport() ? jWindow.width() : jLeft.outerWidth() + jRight.outerWidth()) - jStatus.outerHSpace('p'));
     jFiles.css('width', jRight.innerWidth() - jFiles.outerHSpace());
     jResizer.css({
         left: jLeft.outerWidth() - jFolders.outerRightSpace('m'),
         width: jFolders.outerRightSpace('m') + jFiles.outerLeftSpace('m')
     });
+    _.positionUploadButton();
     _.fixScrollRadius();
 };
 
@@ -250,10 +365,10 @@ _.fixFilesHeight = function () {
     var jFiles = $('#files'),
         jSettings = $('#settings');
 
-    jFiles.css('height',
-        $('#left').outerHeight() - $('#toolbar').outerHeight() - jFiles.outerVSpace() -
+    jFiles.css('height', Math.max(0,
+        $('#right').outerHeight() - $('#toolbar').outerHeight() - jFiles.outerVSpace() -
         ((jSettings.css('display') != "none") ? jSettings.outerHeight() : 0)
-    );
+    ));
 };
 
 _.fixScrollRadius = function () {

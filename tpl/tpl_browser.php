@@ -17,11 +17,15 @@
         <div id="left">
             <div id="folders"></div>
         </div>
+        <div id="foldersBackdrop" aria-hidden="true"></div>
 
         <div id="right">
 
             <div id="toolbar">
                 <div>
+                    <button id="folderToggle" type="button" aria-controls="left" aria-expanded="false">
+                        <span aria-hidden="true"></span><b><?= $this->label("Folders") ?></b>
+                    </button>
                     <a href="kcact:upload"><span><?= $this->label("Upload") ?></span></a>
                     <a href="kcact:refresh"><span><?= $this->label("Refresh") ?></span></a>
                     <a href="kcact:settings"><span><?= $this->label("Settings") ?></span></a>

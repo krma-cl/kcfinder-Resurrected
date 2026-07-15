@@ -102,6 +102,33 @@ tr.selected:hover>td,
     background-image: url(img/icons/maximize.png);
 }
 
+#folderToggle {
+    color: #6b6b6b;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: #e0e0e0;
+}
+
+#folderToggle:hover,
+#folderToggle:focus-visible {
+    color: #414040;
+    border-color: #bebebe;
+    background: #bebebe;
+}
+
+#folderToggle span {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    vertical-align: middle;
+    background: url(img/tree/folder.png) no-repeat center;
+}
+
+#folderToggle b {
+    font-weight: normal;
+}
+
 
 /* SETTINGS BAR */
 

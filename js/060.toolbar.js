@@ -18,8 +18,8 @@ _.initToolbar = function () {
     if ($.$.kuki.get('displaySettings') == "on") {
         $('#toolbar a[href="kcact:settings"]').addClass('selected');
         $('#settings').show();
-        _.resize();
         $('#lang').transForm();
+        _.resize();
     }
 
     $('#toolbar a[href="kcact:settings"]').click(function () {
@@ -28,9 +28,9 @@ _.initToolbar = function () {
             $(this).addClass('selected');
             $.$.kuki.set('displaySettings', "on");
             jSettings.show();
-            _.fixFilesHeight();
             if (!jSettings.find('.tf-select #lang').get(0))
                 $('#lang').transForm();
+            _.fixFilesHeight();
         } else {
             $(this).removeClass('selected');
             $.$.kuki.set('displaySettings', "off");
@@ -73,17 +73,36 @@ _.initUploadButton = function () {
         btn.hide();
         return;
     }
-    var top = btn.get(0).offsetTop,
-        width = btn.outerWidth(),
-        height = btn.outerHeight(),
-        jInput = $('#upload input');
-
-    $('#toolbar').prepend('<div id="upload" style="top:' + top + 'px;width:' + width + 'px;height:' + height + 'px"><form enctype="multipart/form-data" method="post" target="uploadResponse" action="' + _.getURL('upload') + '"><input type="file" name="upload[]" onchange="_.uploadFile(this.form)" style="height:' + height + 'px" multiple="multiple" /><input type="hidden" name="csrf_token" value="' + csrfToken + '"></form></div>');
-    jInput.css('margin-left', "-" + (jInput.outerWidth() - width));
+    $('#toolbar').prepend('<div id="upload"><form enctype="multipart/form-data" method="post" target="uploadResponse" action="' + _.getURL('upload') + '"><input type="file" name="upload[]" onchange="_.uploadFile(this.form)" multiple="multiple" /><input type="hidden" name="csrf_token" value="' + csrfToken + '"></form></div>');
+    _.positionUploadButton();
     $('#upload').mouseover(function () {
         $('#toolbar a[href="kcact:upload"]').addClass('hover');
     }).mouseout(function () {
         $('#toolbar a[href="kcact:upload"]').removeClass('hover');
+    });
+};
+
+_.positionUploadButton = function () {
+    var btn = $('#toolbar a[href="kcact:upload"]'),
+        upload = $('#upload'),
+        input = $('#upload input[type="file"]'),
+        width,
+        height;
+
+    if (!btn.length || !upload.length)
+        return;
+
+    width = btn.outerWidth();
+    height = btn.outerHeight();
+    upload.css({
+        top: btn.get(0).offsetTop,
+        left: btn.get(0).offsetLeft,
+        width: width,
+        height: height
+    });
+    input.css({
+        height: height,
+        marginLeft: "-" + Math.max(0, input.outerWidth() - width)
     });
 };
 

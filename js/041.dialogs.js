@@ -27,6 +27,13 @@ _.alert = function (text, field, options) {
 
     $.extend(o, options);
 
+    if (_.isNarrowViewport()) {
+        o.width = Math.min(parseInt(o.width, 10) || 351, $(window).width() - 16);
+        if (o.height)
+            o.height = Math.min(parseInt(o.height, 10), $(window).height() - 16);
+        o.position = { my: "center", at: "center", of: window };
+    }
+
     return _.dialog(_.label("Warning"), text.replace("\n", "<br />\n"), o);
 };
 

@@ -80,6 +80,7 @@ $lang = array(
   "New folder name:" => "Nuevo nombre de carpeta:",
   "New file name:" => "Nuevo nombre de archivo:",
   "Upload" => "Cargar",
+  "Folders" => "Carpetas",
   "Refresh" => "Refrescar",
   "Settings" => "Preferencias",
   "Maximize" => "Maximizar",
