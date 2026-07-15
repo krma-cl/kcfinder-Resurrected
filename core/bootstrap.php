@@ -17,8 +17,8 @@
  */
 
 // PHP VERSION CHECK
-if (!preg_match('/^(\d+\.\d+)/', PHP_VERSION, $ver) || ($ver[1] < 7.4))
-    die("You are using PHP " . PHP_VERSION . " when KCFinder require at least version 7.4! Some systems has an option to change the active PHP version. Please refer to your hosting provider or upgrade your PHP distribution.");
+if (PHP_VERSION_ID < 80200)
+    die("You are using PHP " . PHP_VERSION . " when KCFinder requires at least version 8.2. Please refer to your hosting provider or upgrade your PHP distribution.");
 
 // SAFE MODE CHECK
 if (ini_get("safe_mode") && strtolower(ini_get("safe_mode")) !== 'off')

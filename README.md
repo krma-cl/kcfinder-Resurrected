@@ -50,7 +50,7 @@ Editor de imágenes Filerobot https://scaleflex.github.io/filerobot-image-editor
 
 ## Compatibility
 * KCFinder se prueba oficialmente en el servidor web Apache 2.4 solamente, pero probablemente funcionará en otros servidores web.
-* Se requiere PHP 7.4 o superior. El modo seguro debe estar desactivado. 
+* Se requiere PHP 8.2 o superior. La matriz mantenida comprende PHP 8.2, 8.3, 8.4 y 8.5.
 * Se requiere al menos una de estas extensiones de PHP: GD, ImageMagick o GraphicsMagick. 
 * Para trabajar con caché HTTP del lado del cliente, el PHP debe instalarse como módulo Apache. 
 * KCFinder soporta el reconocimiento de tipo MIME para los archivos cargados. Si planea usar esta función, debe cargar la extensión Fileinfo PHP. 
@@ -58,8 +58,18 @@ Editor de imágenes Filerobot https://scaleflex.github.io/filerobot-image-editor
 * La rotación automática y volteo de imágenes requiere la extensión PHP EXIF.
 
 ## Desarrollo
-Espero poder subir actualizaciones y correcciones con mas frecuencia, aun falta un reproductor de video y un visor de documentos.
+
+Composer es una herramienta de desarrollo y una futura alternativa de instalación; la distribución tradicional continuará funcionando sin ejecutarlo en producción.
+
+```bash
+composer install
+composer test
+```
+
+`composer test` valida sintaxis, ejecuta PHPUnit y analiza el núcleo con PHPStan. El entorno de desarrollo debe disponer de GD, Fileinfo, ZIP, EXIF, mbstring e Intl.
 
 ## Arquitectura y hoja de ruta
 
 La dirección de la edición mantenida, segura y preparada para producción se documenta en [doc/Architecture.md](doc/Architecture.md). El documento define los principios de compatibilidad, el selector JSON, la distribución mediante Composer, los adaptadores para Laravel y Symfony y la experiencia responsiva.
+
+La superficie HTTP, acciones AJAX y formatos heredados protegidos por las pruebas de caracterización se encuentran en [doc/PublicSurface.md](doc/PublicSurface.md).

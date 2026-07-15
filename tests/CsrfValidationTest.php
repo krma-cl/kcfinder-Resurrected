@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+
+require_once dirname(__DIR__) . '/core/bootstrap.php';
+
+final class CsrfValidationTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        $_SESSION = array();
+        $_COOKIE = array();
+    }
+
+    protected function tearDown(): void
+    {
+        $_SESSION = array();
+        $_COOKIE = array();
+    }
+
+    public static function invalidTokenProvider(): array
+    {
+        return array(
+            'missing session token' => array(array(), array(), '', 'CSRF token missing in session'),
+            'empty session token' => array(array('kcCsrf' => ''), array(), '', 'CSRF token missing in session'),
+            'missing request token' => array(array('kcCsrf' => 'token'), array('kcCsrf' => 'token'), '', 'CSRF token not provided'),
+            'missing cookie token' => array(array('kcCsrf' => 'token'), array(), 'token', 'Invalid or missing CSRF token'),
+            'different request token' => array(array('kcCsrf' => 'token'), array('kcCsrf' => 'token'), 'other', 'Invalid or missing CSRF token'),
+            'different cookie token' => array(array('kcCsrf' => 'token'), array('kcCsrf' => 'other'), 'token', 'Invalid CSRF token'),
+        );
+    }
+
+    #[DataProvider('invalidTokenProvider')]
+    public function testInvalidCsrfStatesRetainTheirCurrentResponse(
+        array $session,
+        array $cookie,
+        string $requestToken,
+        string $expected
+    ): void {
+        $_SESSION = $session;
+        $_COOKIE = $cookie;
+
+        self::assertSame($expected, validateCSRF($requestToken));
+    }
+
+    public function testMatchingSessionCookieAndRequestTokenAreAccepted(): void
+    {
+        $_SESSION['kcCsrf'] = 'token';
+        $_COOKIE['kcCsrf'] = 'token';
+
+        self::assertTrue(validateCSRF('token'));
+    }
+}

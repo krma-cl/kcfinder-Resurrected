@@ -1,0 +1,141 @@
+# Superficie pública y compatibilidad heredada
+
+| Campo | Valor |
+|---|---|
+| Estado | Línea base de caracterización |
+| Fecha | 2026-07-14 |
+| Rama inicial | `krma/phase1-baseline` |
+
+## Propósito
+
+Este inventario registra los puntos de entrada, acciones y contratos observables de KCFinder Resurrected antes de reorganizar el núcleo. No declara que todos los comportamientos actuales sean el diseño final; identifica aquello que debe preservarse, migrarse explícitamente o deprecarse con una alternativa documentada.
+
+La arquitectura objetivo se encuentra en [Architecture.md](Architecture.md).
+
+## Puntos de entrada HTTP
+
+| Punto de entrada | Método habitual | Responsabilidad | Compatibilidad |
+|---|---|---|---|
+| `browse.php` | GET y POST | Interfaz, navegación y operaciones AJAX seleccionadas mediante `act` | Público heredado |
+| `upload.php` | POST multipart | Upload directo y callbacks de editores | Público heredado |
+| `js_localize.php` | GET | Traducciones JavaScript mediante `lng` | Público heredado |
+| `themes/<theme>/css.php` | GET | CSS combinado y cacheado del tema | Tema público |
+| `themes/<theme>/js.php` | GET | JavaScript combinado y cacheado del tema | Tema público |
+| `index.php` | GET | Ejemplo de integración | Ejemplo, no API |
+
+`core/bootstrap.php` es el bootstrap común de `browse.php` y `upload.php`. Carga la integración solicitada mediante `cms`, registra el autoloader y define la validación CSRF heredada.
+
+## Acciones de `browse.php`
+
+El parámetro GET `act` selecciona un método `act_<acción>` de `kcfinder\browser`. Una acción desconocida vuelve actualmente a `browser`.
+
+| Acción | Solicitud principal | Mutabilidad | CSRF actual | Respuesta principal |
+|---|---|---:|---:|---|
+| `browser` | GET | No | No | HTML |
+| `init` | GET | No | No | JSON con árbol, archivos y permisos |
+| `thumb` | GET | Puede crear caché | No | Imagen |
+| `expand` | POST | No | Sí | JSON con carpetas |
+| `chDir` | POST | Sesión | Sí | JSON con archivos y permisos |
+| `newDir` | POST | Sí | Sí | JSON vacío o error |
+| `crop` | POST | Sí | Sí | JSON |
+| `editimage` | POST | Sí | Sí | JSON |
+| `renameDir` | POST | Sí | Sí | JSON con nombre |
+| `deleteDir` | POST | Sí | Sí | JSON vacío o error |
+| `upload` | POST/GET | Sí | Sí, delegado a uploader | Texto/HTML/JSON según integración |
+| `dragUrl` | POST | Sí y acceso remoto | Sí | JSON vacío o error |
+| `download` | POST | No | Sí | Archivo binario |
+| `rename` | POST | Sí | Sí | JSON con nombre |
+| `delete` | POST | Sí | Sí | JSON vacío o error |
+| `cp_cbd` | POST | Sí | Sí | JSON |
+| `mv_cbd` | POST | Sí | Sí | JSON |
+| `rm_cbd` | POST | Sí | Sí | JSON |
+| `downloadDir` | POST | Crea ZIP temporal | Sí | ZIP |
+| `downloadSelected` | POST | Crea ZIP temporal | Sí | ZIP |
+| `downloadClipboard` | POST | Crea ZIP temporal | Sí | ZIP |
+
+La ausencia de CSRF en una acción GET no implica que deba mantenerse si la acción produce efectos persistentes. El caso `thumb` requiere una decisión explícita porque puede generar una miniatura en caché.
+
+## Parámetros de integración observados
+
+| Parámetro | Uso actual |
+|---|---|
+| `cms` | Selecciona un archivo bajo `integration/` cuando el nombre es válido |
+| `type` | Selecciona uno de los tipos configurados |
+| `theme` | Selecciona temporalmente un directorio de tema válido |
+| `lang`, `langCode`, `lng`, `language`, `lang_code` | Seleccionan idioma cuando existe su archivo |
+| `CKEditorFuncNum` | Activa callback CKEditor |
+| `opener` | Selecciona integraciones heredadas como TinyMCE |
+| `field` | Campo de destino utilizado por TinyMCE 4 |
+| `format=json` | Solicita la respuesta JSON heredada de upload |
+| `dir`, `file`, `files` | Rutas lógicas y nombres utilizados por acciones de archivos |
+
+Los nombres anteriores forman parte de la compatibilidad de entrada. Su aceptación no exime la validación por tipo, formato, autorización y confinamiento de ruta.
+
+## Formato JSON heredado de upload
+
+Una carga exitosa con `format=json` devuelve actualmente:
+
+```json
+{
+  "uploaded": 1,
+  "url": "http://example.test/upload/files/document.pdf",
+  "fileName": "document.pdf"
+}
+```
+
+Un error devuelve:
+
+```json
+{
+  "uploaded": 0,
+  "error": {
+    "message": "Descripción del error"
+  }
+}
+```
+
+Este contrato no será reemplazado silenciosamente. El futuro objeto del selector (`name`, `path`, `url`, `mime`, `size`) se agregará como API versionada y convivirá inicialmente con esta respuesta.
+
+## Configuración y sesión
+
+La configuración se obtiene de `conf/config.php`, puede ser complementada por `conf/config.local.php` y permite que determinados valores sean sobrescritos mediante `$_SESSION['KCFINDER']`.
+
+Superficies que deben conservar una ruta de migración:
+
+- `disabled`, `uploadURL`, `uploadDir`, `theme` y `lang`.
+- `types` y opciones específicas por tipo.
+- `imageDriversPriority`, dimensiones, calidad y miniaturas.
+- `allowExts` y `allowMimeTypes`.
+- Permisos `access` de archivos y carpetas.
+- Cookies, `_sessionVar`, `_sessionCsrf` y restricciones de dominio.
+- Directorio de thumbnails, permisos y política de ZIP.
+
+El núcleo futuro deberá normalizar estos valores en objetos internos sin obligar inicialmente a cambiar la configuración tradicional.
+
+## Extensiones y capacidades
+
+La línea base diferencia requisitos de ejecución y capacidades:
+
+- Se necesita al menos un controlador de imágenes compatible: GD, Imagick o Gmagick.
+- Intl es utilizado por el reemplazo de `strftime()` cargado por el navegador.
+- Fileinfo respalda la comprobación MIME de uploads.
+- ZIP habilita descargas comprimidas.
+- EXIF permite corregir orientación de imágenes cuando corresponda.
+- JSON y sesiones son parte del funcionamiento HTTP básico.
+
+La decisión definitiva sobre extensiones obligatorias de Composer se registrará antes de publicar el paquete. La distribución de desarrollo seguirá probando GD, Fileinfo, ZIP, EXIF, mbstring e Intl.
+
+## Integraciones existentes
+
+Los archivos bajo `integration/` modifican sesión y configuración antes de construir el navegador. Incluyen integraciones predeterminadas y adaptadores heredados de CMS. Se consideran puntos de compatibilidad, pero no serán el mecanismo recomendado para los futuros paquetes de Laravel y Symfony.
+
+Los adaptadores modernos deberán utilizar contratos públicos de autorización, almacenamiento y resolución de URLs, sin duplicar reglas de seguridad del núcleo.
+
+## Reglas para cambios posteriores
+
+1. Agregar una prueba antes de cambiar una superficie inventariada.
+2. No reutilizar un campo heredado con una semántica distinta.
+3. Versionar nuevos contratos JSON.
+4. Mantener temporalmente un adaptador cuando se reemplace una API.
+5. Documentar deprecaciones y versión prevista de retiro.
+6. No considerar una acción segura únicamente porque su botón no esté visible.

@@ -5,3 +5,8 @@ upload/*
 cache/*
 !cache/.gitkeep
 !cache/.htaccess
+/conf/config.local.php
+/.phpunit.cache/
+/.phpunit.result.cache
+/tmp/
+/vendor/

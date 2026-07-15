@@ -1,0 +1,11 @@
+parameters:
+    level: 0
+    paths:
+        - browse.php
+        - upload.php
+        - core
+        - lib
+    excludePaths:
+        analyse:
+            - lib/strftime.php
+    tmpDir: /tmp/phpstan
