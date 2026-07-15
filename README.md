@@ -40,6 +40,13 @@ KCFinder es un administrador de archivos web de código abierto que puede integr
 - Reconocimiento MIME mediante Fileinfo.
 - Soporte para múltiples idiomas y temas.
 - Tema Bootstrap 5 desacoplado y opcional.
+- Interfaz responsiva con panel móvil de carpetas y controles accesibles por teclado.
+
+## Interfaz responsiva
+
+En pantallas menores a 768 píxeles, el árbol de carpetas se transforma en un panel lateral accesible desde el botón **Carpetas**. El panel se cierra al elegir una carpeta, tocar el fondo o presionar `Escape`; además, conserva el foco dentro del panel mientras está abierto y lo devuelve al botón al cerrarse.
+
+El comportamiento forma parte del núcleo y funciona con el tema clásico. Los temas opcionales pueden adaptar su presentación sin sustituir el controlador responsivo ni introducir una dependencia obligatoria en Bootstrap.
 
 ## Instalación
 
