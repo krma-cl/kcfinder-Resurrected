@@ -11,7 +11,7 @@ Esta guía está dirigida a mantenedores. La fuente de verdad es un tag SemVer d
 
 ## Tag y GitHub Release
 
-Use un tag como `v4.3.0` o `v4.3.0-rc.1`. Al subirlo, el flujo **Release**:
+Use un tag como `v4.5.0` o `v4.5.0-rc.1`. Al subirlo, el flujo **Release**:
 
 - valida el formato del tag;
 - repite la suite de calidad;

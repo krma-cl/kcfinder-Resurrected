@@ -338,9 +338,9 @@ Esta separación evita incorporar dependencias de frameworks al núcleo y permit
 
 ### Fase 7: adaptadores
 
-- Publicar el adaptador Laravel.
-- Publicar el bundle Symfony.
-- Mantener aplicaciones de ejemplo y pruebas de integración.
+- Publicar el [adaptador Laravel](https://github.com/krma-cl/kcfinder-laravel).
+- Publicar el [bundle Symfony](https://github.com/krma-cl/kcfinder-symfony-bundle).
+- Mantener pruebas de integración y ciclos de versión independientes del núcleo.
 
 ## 17. Versionado propuesto
 

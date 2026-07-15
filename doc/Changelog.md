@@ -1,3 +1,14 @@
+4.5.0: 2026-07-15
+-----------------
+* Primera versión estable de la línea mantenida por krma-cl.
+* Compatibilidad comprobada con PHP 8.2, 8.3, 8.4 y 8.5.
+* Selector moderno JSON con nombre, ruta lógica, URL, MIME y tamaño.
+* Interfaz responsiva y accesible con panel móvil de carpetas.
+* Contratos desacoplados para autorización, metadatos y resolución de URL.
+* Adaptadores oficiales para Laravel 12-13 y Symfony 7.4-8.x.
+* Distribuciones reproducibles mediante Composer y ZIP tradicional.
+* Refuerzos de seguridad en uploads, rutas, CSRF y sesiones.
+
 4.00-test1: 2025-04-01
 * Agregado CSRF Token a todos los endpoint de core/browser.php
 * Agregado CSRF Token a core/uploader.php

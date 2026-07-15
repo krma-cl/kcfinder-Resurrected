@@ -13,14 +13,13 @@ No es un parche temporal del repositorio histórico: es una línea de continuida
 
 ## Estado del proyecto
 
-- Versión publicada: [`v4.3.0-rc.1`](https://github.com/krma-cl/kcfinder-Resurrected/releases/tag/v4.3.0-rc.1).
+- Versión estable: [`v4.5.0`](https://github.com/krma-cl/kcfinder-Resurrected/releases/tag/v4.5.0).
 - Paquete Composer: [`krma-cl/kcfinder`](https://packagist.org/packages/krma-cl/kcfinder).
 - Compatibilidad mantenida: PHP 8.2, 8.3, 8.4 y 8.5.
 - Distribución tradicional mediante ZIP autosuficiente.
 - Matriz continua de sintaxis, PHPUnit, PHPStan y validación de artefactos.
 - Selector moderno JSON opt-in, sin retirar el selector heredado.
-
-La serie `4.3` se encuentra actualmente en fase de *release candidate*. La interfaz responsiva y los adaptadores oficiales para Laravel y Symfony forman parte de las siguientes etapas de la hoja de ruta.
+- Adaptadores oficiales, versionados de forma independiente, para Laravel y Symfony.
 
 ## Qué es KCFinder
 
@@ -58,13 +57,20 @@ Las instrucciones completas se encuentran en [doc/Distribution.md](doc/Distribut
 
 ### Composer
 
-Mientras la versión disponible sea un *release candidate*:
-
 ```bash
-composer require krma-cl/kcfinder:^4.3@RC
+composer require krma-cl/kcfinder
 ```
 
 Composer instala el paquete en `vendor/krma-cl/kcfinder` y expone el namespace moderno `KCFinder\` mediante PSR-4. No publique el directorio `vendor` completo como raíz web; para la interfaz independiente utilice el ZIP tradicional o una publicación controlada de recursos.
+
+### Laravel y Symfony
+
+Los adaptadores oficiales conectan el selector moderno con el almacenamiento, la autorización y los eventos de cada framework, sin agregar dependencias al núcleo:
+
+- [`krma-cl/kcfinder-laravel`](https://github.com/krma-cl/kcfinder-laravel), para Laravel 12 y 13.
+- [`krma-cl/kcfinder-symfony-bundle`](https://github.com/krma-cl/kcfinder-symfony-bundle), para Symfony 7.4 y 8.x con Flysystem 3.
+
+El navegador sigue pudiendo desplegarse de manera tradicional. Los adaptadores no exigen Laravel o Symfony a quienes sólo necesitan KCFinder independiente.
 
 ## Selector moderno
 
@@ -124,7 +130,7 @@ La dirección del proyecto está documentada en [doc/Architecture.md](doc/Archit
 4. Selector JSON moderno.
 5. Composer, Packagist y releases reproducibles.
 6. Interfaz responsiva y accesible.
-7. Adaptadores oficiales para Laravel y Symfony.
+7. Adaptadores oficiales para Laravel y Symfony, publicados en repositorios independientes.
 
 La superficie HTTP y los comportamientos heredados protegidos por pruebas se describen en [doc/PublicSurface.md](doc/PublicSurface.md). Las decisiones arquitectónicas relevantes se registran en [`doc/adr`](doc/adr).
 
