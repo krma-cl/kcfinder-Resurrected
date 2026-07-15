@@ -142,6 +142,8 @@ composer test
 
 `composer test` valida sintaxis, ejecuta PHPUnit y analiza el código moderno con PHPStan. El pipeline repite estas verificaciones en PHP 8.2, 8.3, 8.4 y 8.5.
 
+La [revisión periódica de versiones](docs/upstream-version-check.md) permite comprobar nuevas versiones estables de PHP, Laravel, Symfony, Bootstrap y las demás tecnologías principales sin actualizar dependencias automáticamente.
+
 Para construir y verificar localmente los dos formatos de distribución:
 
 ```bash
