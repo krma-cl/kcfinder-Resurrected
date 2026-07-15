@@ -82,6 +82,8 @@ $_LOCALS = array(
     '_denyExtDomains' => true,
     '_allowDomains' => array("127.0.0.1", "localhost"),
     '_sessionCsrf' => true,
+    // Cross-origin targets allowed for the versioned selector. Same-origin is always allowed.
+    '_selectorAllowedOrigins' => array(),
 
     /**
      * Cookies

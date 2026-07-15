@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/core/autoload.php';
+require_once dirname(__DIR__, 2) . '/core/bootstrap.php';
 require_once dirname(__DIR__, 2) . '/lib/strftime.php';
 
 final class CharacterizationBrowser extends kcfinder\browser
@@ -51,6 +51,7 @@ final class CharacterizationBrowser extends kcfinder\browser
             '_dropUploadMaxFilesize' => 10 * 1024 * 1024,
             '_maxImagePixels' => 25_000_000,
             '_normalizeFilenames' => true,
+            'disabled' => false,
         );
 
         $this->imageDriver = 'gd';
@@ -64,6 +65,12 @@ final class CharacterizationBrowser extends kcfinder\browser
         $this->charset = 'UTF-8';
         $this->labels = array();
         $this->session = array('dir' => 'files');
+        $this->selector = array(
+            'enabled' => true,
+            'multiple' => true,
+            'targetOrigin' => 'http://localhost:8080',
+            'error' => null,
+        );
     }
 
     public function checkFixtureInputDirectory(string $directory, bool $includeType = true, bool $existing = true): string|false
@@ -119,6 +126,15 @@ final class CharacterizationBrowser extends kcfinder\browser
     public function deleteFixtureDirectory(): bool
     {
         return $this->act_deleteDir();
+    }
+
+    public function selectFixtureFiles(array $request, bool $enabled = true, bool $multiple = true): array
+    {
+        $this->selector['enabled'] = $enabled;
+        $this->selector['multiple'] = $multiple;
+        $_POST = $request;
+
+        return json_decode($this->act_select(), true, 512, JSON_THROW_ON_ERROR);
     }
 
     protected function checkUploadedFile($aFile = array(), $Check_isuploaded = true)

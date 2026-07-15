@@ -41,6 +41,7 @@ final class BrowserActionSurfaceTest extends TestCase
             'rename',
             'renameDir',
             'rm_cbd',
+            'select',
             'thumb',
             'upload',
         ), $actions);

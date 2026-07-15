@@ -14,6 +14,17 @@ spl_autoload_register(function ($path) {
     if (count($path) == 1)
         return;
 
+    if ((count($path) > 2) && (strcasecmp($path[0], 'KCFinder') === 0)) {
+        $relative = implode('/', array_slice($path, 1));
+        if (preg_match('#^[A-Za-z0-9_/]+$#', $relative)) {
+            $file = dirname(__DIR__) . "/src/$relative.php";
+            if (is_file($file)) {
+                require $file;
+                return;
+            }
+        }
+    }
+
     list($ns, $class) = $path;
 
     if ($ns == "kcfinder") {

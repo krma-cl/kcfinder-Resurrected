@@ -10,6 +10,8 @@
 
 namespace kcfinder;
 
+use KCFinder\Application\SelectorOptions;
+
 class uploader
 {
 
@@ -89,6 +91,14 @@ class uploader
      * @var string */
     protected $outputFormat = 'js';
 
+    /** Versioned selector options derived from trusted configuration and the current request. */
+    protected $selector = array(
+        'enabled' => false,
+        'multiple' => false,
+        'targetOrigin' => null,
+        'error' => null,
+    );
+
 
     /** Magic method which allows read-only access to protected or private class properties
      * @param string $property
@@ -132,6 +142,11 @@ class uploader
         $session = new session("conf/config.php", $this->uploadedFiles);
         $this->config = $session->getConfig();
         $this->session = &$session->values;
+        $this->selector = SelectorOptions::fromRequest(
+            $_GET,
+            (array) ($this->config['_selectorAllowedOrigins'] ?? array()),
+            CUR_PAGE
+        )->toArray();
 
         // IMAGE DRIVER INIT
         if (isset($this->config['imageDriversPriority'])) {

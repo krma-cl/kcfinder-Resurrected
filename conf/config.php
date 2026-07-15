@@ -135,6 +135,7 @@ $_DEFAULTS = array(
     '_allowDomains' => array("localhost", "127.0.0.1"),
     '_sessionVar' => "KCFINDER",
     '_sessionCsrf' => true,
+    '_selectorAllowedOrigins' => array(),
     '_check4htaccess' => true,
     '_normalizeFilenames' => true,
     '_dropUploadMaxFilesize' => 10485760, //9MB

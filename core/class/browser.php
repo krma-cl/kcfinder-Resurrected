@@ -12,6 +12,11 @@ namespace kcfinder;
 
 use Exception;
 use InvalidArgumentException;
+use KCFinder\Application\FileSelectionService;
+use KCFinder\Application\SelectorEnvelope;
+use KCFinder\Infrastructure\CallbackAuthorization;
+use KCFinder\Infrastructure\LocalFileMetadataReader;
+use KCFinder\Infrastructure\PrefixUrlResolver;
 use RuntimeException;
 use function \PHP81_BC\strftime;
 
@@ -134,6 +139,75 @@ class browser extends uploader
             'dirWritable' => $dirWritable
         );
         return json_encode($data);
+    }
+
+    protected function act_select()
+    {
+        header("Content-Type: application/json; charset={$this->charset}");
+
+        if (empty($this->selector['enabled'])) {
+            return $this->selectorError('selector_disabled', 'The modern selector is not enabled for this request.');
+        }
+
+        if (validateCSRF($_POST['csrf_token'] ?? '') !== true) {
+            return $this->selectorError('invalid_csrf', 'The selector request could not be validated.');
+        }
+
+        $directory = $_POST['dir'] ?? null;
+        $files = $_POST['files'] ?? null;
+        $multipleInput = $_POST['multiple'] ?? '0';
+        $multiple = is_string($multipleInput) && $multipleInput === '1';
+        if (!is_string($directory) || !is_array($files) || $files === [] || count($files) > 100) {
+            return $this->selectorError('invalid_request', 'The selector request is invalid.');
+        }
+        if (!is_string($multipleInput)) {
+            return $this->selectorError('invalid_request', 'The selector request is invalid.');
+        }
+
+        if (($multiple || count($files) > 1) && empty($this->selector['multiple'])) {
+            return $this->selectorError('multiple_not_enabled', 'Multiple selection is not enabled.');
+        }
+
+        $relativeDirectory = $this->checkInputDir($directory, false, true);
+        if ($relativeDirectory === false) {
+            return $this->selectorError('invalid_path', 'The requested directory is invalid.');
+        }
+
+        $service = new FileSelectionService(
+            new LocalFileMetadataReader($this->typeDir, new PrefixUrlResolver($this->typeURL)),
+            new CallbackAuthorization(function (string $operation, string $path): bool {
+                return $operation === FileSelectionService::OPERATION && !$this->config['disabled'];
+            })
+        );
+
+        try {
+            $selected = array();
+            foreach ($files as $name) {
+                if (!is_string($name) || !$this->checkFilename($name)) {
+                    return $this->selectorError('invalid_file', 'A selected file name is invalid.');
+                }
+
+                $path = '/' . (strlen($relativeDirectory) ? trim($relativeDirectory, '/') . '/' : '') . $name;
+                $selected[] = $service->select($path);
+            }
+
+            $envelope = $multiple || count($selected) > 1
+                ? SelectorEnvelope::multiple($selected)
+                : SelectorEnvelope::single($selected[0]);
+
+            return json_encode($envelope, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        } catch (InvalidArgumentException | RuntimeException $exception) {
+            return $this->selectorError('selection_failed', 'The requested file could not be selected.');
+        }
+    }
+
+    private function selectorError($code, $message)
+    {
+        return json_encode(array(
+            'event' => 'kcfinder:selection-error',
+            'version' => 1,
+            'error' => array('code' => $code, 'message' => $message),
+        ));
     }
 
     protected function act_thumb()
