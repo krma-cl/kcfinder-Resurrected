@@ -33,6 +33,7 @@ El parámetro GET `act` selecciona un método `act_<acción>` de `kcfinder\brows
 |---|---|---:|---:|---|
 | `browser` | GET | No | No | HTML |
 | `init` | GET | No | No | JSON con árbol, archivos y permisos |
+| `select` | POST | No | Sí | Sobre JSON v1 con metadatos verificados |
 | `thumb` | GET | Puede crear caché | No | Imagen |
 | `expand` | POST | No | Sí | JSON con carpetas |
 | `chDir` | POST | Sesión | Sí | JSON con archivos y permisos |
@@ -67,6 +68,7 @@ La ausencia de CSRF en una acción GET no implica que deba mantenerse si la acci
 | `opener` | Selecciona integraciones heredadas como TinyMCE |
 | `field` | Campo de destino utilizado por TinyMCE 4 |
 | `format=json` | Solicita la respuesta JSON heredada de upload |
+| `selector`, `selectorMultiple`, `selectorOrigin` | Activa el selector moderno, selección múltiple y origen de entrega validado |
 | `dir`, `file`, `files` | Rutas lógicas y nombres utilizados por acciones de archivos |
 
 Los nombres anteriores forman parte de la compatibilidad de entrada. Su aceptación no exime la validación por tipo, formato, autorización y confinamiento de ruta.
@@ -95,6 +97,8 @@ Un error devuelve:
 ```
 
 Este contrato no será reemplazado silenciosamente. El futuro objeto del selector (`name`, `path`, `url`, `mime`, `size`) se agregará como API versionada y convivirá inicialmente con esta respuesta.
+
+El selector moderno ya convive con este formato y se documenta en [ModernSelector.md](ModernSelector.md). No modifica `format=json` ni los callbacks heredados cuando no se solicita explícitamente.
 
 ## Configuración y sesión
 

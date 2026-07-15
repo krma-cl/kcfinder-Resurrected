@@ -2,9 +2,9 @@
 
 ## Estado
 
-Esta es la primera capacidad de la fase 3. Implementa el objeto de archivo y la lectura local de metadatos, pero todavía no cambia `browse.php`, `upload.php`, `format=json` ni los callbacks de editores.
+Esta capacidad nació en la fase 3 e implementa el objeto de archivo y la lectura local de metadatos. La fase 4 la utiliza desde el selector moderno opt-in; `upload.php`, `format=json` y los callbacks heredados de editores conservan su contrato.
 
-Las clases nuevas se cargan mediante Composer:
+Las clases nuevas se cargan mediante Composer y también mediante el cargador incluido en la distribución tradicional:
 
 ```php
 require __DIR__ . '/vendor/autoload.php';

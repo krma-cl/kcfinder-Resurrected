@@ -74,4 +74,6 @@ La dirección de la edición mantenida, segura y preparada para producción se d
 
 La superficie HTTP, acciones AJAX y formatos heredados protegidos por las pruebas de caracterización se encuentran en [doc/PublicSurface.md](doc/PublicSurface.md).
 
+El selector JSON opt-in, sus callbacks estructurados y la configuración segura de `postMessage` se documentan en [doc/ModernSelector.md](doc/ModernSelector.md).
+
 La configuración mínima de producción y el canal privado para reportar vulnerabilidades se encuentran en [SECURITY.md](SECURITY.md).

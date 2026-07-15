@@ -149,7 +149,7 @@ Semántica:
 
 El objeto podrá crecer de forma compatible con propiedades opcionales. La eliminación o reinterpretación de propiedades requerirá una nueva versión del contrato.
 
-La implementación inicial y su uso independiente de los endpoints heredados se documentan en [FileMetadataContract.md](FileMetadataContract.md).
+La implementación inicial se documenta en [FileMetadataContract.md](FileMetadataContract.md) y su protocolo de entrega en [ModernSelector.md](ModernSelector.md) y [ADR 0003](adr/0003-versioned-selector-protocol.md).
 
 ### 7.2 Canales de entrega
 
