@@ -13,6 +13,11 @@
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5"
     },
+    "autoload": {
+        "psr-4": {
+            "KCFinder\\": "src/"
+        }
+    },
     "scripts": {
         "lint": "@php tools/lint.php",
         "phpunit": "phpunit --configuration phpunit.xml.dist",

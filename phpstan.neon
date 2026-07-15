@@ -5,6 +5,7 @@ parameters:
         - upload.php
         - core
         - lib
+        - src
     excludePaths:
         analyse:
             - lib/strftime.php
