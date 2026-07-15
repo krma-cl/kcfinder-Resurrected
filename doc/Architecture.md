@@ -1,6 +1,6 @@
 # Arquitectura y hoja de ruta de KCFinder Resurrected
 
-> **A maintained, security-focused and production-ready continuation of KCFinder, preserving backward compatibility and lightweight deployment.**
+> **A maintained, security-focused continuation of KCFinder, designed for modern production environments while preserving backward compatibility and lightweight deployment.**
 
 | Campo | Valor |
 |---|---|
