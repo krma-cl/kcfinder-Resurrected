@@ -1153,8 +1153,10 @@ class browser extends uploader
             $thumb = file_exists("$thumbDir/$name");
             if ($type && count($size) >= 2)
                 list($width, $height) = $size;
-            else
-                list($width, $height) = false;
+            else {
+                $width = null;
+                $height = null;
+            }
             $return[] = array(
                 'name' => stripcslashes($name),
                 'size' => $stat['size'],

@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | Línea base de caracterización |
+| Estado | Línea base de caracterización con operaciones de archivos |
 | Fecha | 2026-07-14 |
 | Rama inicial | `krma/phase1-baseline` |
 
@@ -139,3 +139,21 @@ Los adaptadores modernos deberán utilizar contratos públicos de autorización,
 4. Mantener temporalmente un adaptador cuando se reemplace una API.
 5. Documentar deprecaciones y versión prevista de retiro.
 6. No considerar una acción segura únicamente porque su botón no esté visible.
+
+## Cobertura automatizada de operaciones de archivos
+
+La línea base ejecuta las operaciones reales sobre un directorio temporal aislado. No escribe en la carpeta `upload` del desarrollador ni sustituye el almacenamiento local del producto por una implementación simulada.
+
+| Contrato protegido | Evidencia automatizada |
+|---|---|
+| Navegación de carpetas | Orden estable, exclusión de directorios ocultos y detección de subcarpetas |
+| Listado de archivos | Nombre, tamaño, dimensiones, identificación de imagen y estado de miniatura |
+| Confinamiento de rutas | Rechazo de tipo incorrecto, segmentos `..`, rutas ocultas y rutas fuera del directorio asignado |
+| Normalización heredada | Nombres de archivo y directorio con caracteres no ASCII |
+| Upload | Validación MIME/extensión, normalización del nombre y sufijo sin sobrescritura |
+| Miniaturas | Creación real mediante GD y dimensiones resultantes |
+| Eliminación | Borrado del archivo o árbol solicitado junto con su miniatura correspondiente |
+
+Estas pruebas son de caracterización del núcleo. Aún se mantienen como trabajo separado las pruebas HTTP de extremo a extremo para descarga binaria, descarga ZIP, callbacks de editores, sesión completa en Apache y operaciones AJAX desde la interfaz. Esos casos deberán conservar la validación CSRF y comprobar tanto cabeceras como cuerpo de respuesta.
+
+La configuración de PHPUnit trata warnings, riesgos y deprecations como fallos. La matriz de desarrollo ejecuta sintaxis, PHPUnit y análisis estático en PHP 8.2, 8.3, 8.4 y 8.5 sin ocultar diagnósticos.

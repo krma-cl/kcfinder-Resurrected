@@ -16,7 +16,7 @@ namespace kcfinder;
 class fastImage
 {
   private $strpos = 0;
-  private $str;
+  private $str = '';
   private $uri;
   private $type;
   private $handle;
@@ -30,6 +30,9 @@ class fastImage
   {
     if ($this->handle) $this->close();
 
+    $this->strpos = 0;
+    $this->str = '';
+    $this->type = null;
     $this->uri = $uri;
     // Joy - this is a fix for URLs missing "http:"
     if ($uri[0] == '/' && $uri[1] == '/') {

@@ -479,7 +479,6 @@ class uploader
         $allowedMimeTypes = (array)($this->config['allowMimeTypes'] ?? []);
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
         if (!in_array($mime, $allowedMimeTypes, true)) {
             @unlink($file['tmp_name']);
             return $this->label("The file MimeType '{detected_type}' is not allowed.", ['detected_type' => $mime]);

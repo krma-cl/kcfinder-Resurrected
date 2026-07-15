@@ -215,7 +215,12 @@ class image_gd extends image
             imagealphablending($image, false);
             imagesavealpha($image, true);
             return $image;
-        } elseif (is_string($image) && (false !== (list($width, $height, $t) = @getimagesize($image)))) {
+        } elseif (is_string($image)) {
+            $size = @getimagesize($image);
+            if ($size === false)
+                return false;
+            list($width, $height, $t) = $size;
+
             if ($this->checkMemoryLimitOverload($width * $height * 4)) return false;
             $image =
                 ($t == IMAGETYPE_GIF)  ? @imagecreatefromgif($image)  : (
@@ -244,11 +249,13 @@ class image_gd extends image
 
     static function checkImage($file)
     {
-        if (
-            !is_string($file) ||
-            ((false === (list($width, $height, $t) = @getimagesize($file))))
-        )
+        if (!is_string($file))
             return false;
+
+        $size = @getimagesize($file);
+        if ($size === false)
+            return false;
+        list($width, $height, $t) = $size;
 
         $img =
             ($t == IMAGETYPE_GIF)  ? @imagecreatefromgif($file)  : (
@@ -267,8 +274,8 @@ class image_gd extends image
     protected function output_png(array $options = array())
     {
         $file = isset($options['file']) ? $options['file'] : null;
-        $quality = isset($options['quality']) ? $options['quality'] : null;
-        $filters = isset($options['filters']) ? $options['filters'] : null;
+        $quality = isset($options['quality']) ? $options['quality'] : -1;
+        $filters = isset($options['filters']) ? $options['filters'] : -1;
         if (($file === null) && !headers_sent())
             header("Content-Type: image/png");
         return imagepng($this->image, $file, $quality, $filters);
