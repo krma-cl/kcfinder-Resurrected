@@ -103,6 +103,31 @@ final class CharacterizationBrowser extends kcfinder\browser
         return $this->moveUploadFile($file, $directory);
     }
 
+    public function observeFixtureOperations(\KCFinder\Contract\OperationObserverInterface $observer): void
+    {
+        $this->operationObserver = $observer;
+    }
+
+    public function createObservedDirectory(): bool
+    {
+        return $this->act_newDir();
+    }
+
+    public function renameObservedFile(): bool
+    {
+        return $this->act_rename();
+    }
+
+    public function moveObservedFiles(): string|bool
+    {
+        return $this->act_mv_cbd();
+    }
+
+    public function deleteObservedFiles(): string|bool
+    {
+        return $this->act_rm_cbd();
+    }
+
     public function createFixtureThumbnail(string $file, bool $overwrite = true): bool
     {
         return $this->makeThumb($file, $overwrite);

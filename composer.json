@@ -53,15 +53,15 @@
     "scripts": {
         "lint": "@php tools/lint.php",
         "phpunit": "phpunit --configuration phpunit.xml.dist",
-        "phpstan": "phpstan analyse --configuration phpstan.neon --no-progress",
+        "phpstan": "phpstan analyse --configuration phpstan.neon --no-progress --memory-limit=512M",
         "test": [
             "@lint",
             "@phpunit",
             "@phpstan"
         ],
         "package": [
-            "@php tools/build-release.php --version=4.5.0-dev",
-            "@php tools/verify-release.php dist/kcfinder-resurrected-4.5.0-dev.zip",
+            "@php tools/build-release.php --version=4.6.0-dev",
+            "@php tools/verify-release.php dist/kcfinder-resurrected-4.6.0-dev.zip",
             "@composer archive --format=zip --dir=dist/composer --file=kcfinder-composer",
             "@php tools/verify-composer-archive.php dist/composer/kcfinder-composer.zip"
         ]

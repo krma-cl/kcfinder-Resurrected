@@ -11,6 +11,11 @@
 namespace kcfinder;
 
 use KCFinder\Application\SelectorOptions;
+use KCFinder\Contract\OperationObserverInterface;
+use KCFinder\Domain\LogicalPath;
+use KCFinder\Domain\OperationContext;
+use KCFinder\Infrastructure\NullOperationObserver;
+use Throwable;
 
 class uploader
 {
@@ -68,6 +73,9 @@ class uploader
      * @var array */
     protected $file;
     protected $uploadedFiles = [];
+
+    /** Optional observer for successful filesystem mutations. */
+    protected $operationObserver;
 
     /** Next three properties are got from the current language file
      * @var string */
@@ -142,6 +150,10 @@ class uploader
         $session = new session("conf/config.php", $this->uploadedFiles);
         $this->config = $session->getConfig();
         $this->session = &$session->values;
+        $configuredObserver = $this->config['_operationObserver'] ?? null;
+        $this->operationObserver = $configuredObserver instanceof OperationObserverInterface
+            ? $configuredObserver
+            : new NullOperationObserver();
         $this->selector = SelectorOptions::fromRequest(
             $_GET,
             (array) ($this->config['_selectorAllowedOrigins'] ?? array()),
@@ -389,6 +401,10 @@ class uploader
                 else {
                     if (function_exists('chmod')) @chmod($target, $this->config['filePerms']);
                     $this->makeThumb($target);
+                    $this->observeSucceeded(new OperationContext(
+                        'upload',
+                        $this->operationLogicalPath($target)
+                    ));
                     $url = $this->typeURL;
                     if (isset($udir)) $url .= "/$udir";
                     $url .= "/" . basename($target);
@@ -410,6 +426,66 @@ class uploader
             $this->errorMsg($message);
         else
             $this->callBack($url, $message);
+    }
+
+    protected function observeBefore(OperationContext $operation): mixed
+    {
+        try {
+            return $this->operationObserver()->before($operation);
+        } catch (Throwable $exception) {
+            $this->logObserverFailure('before', $operation, $exception);
+            return null;
+        }
+    }
+
+    protected function observeSucceeded(OperationContext $operation, mixed $previousState = null): void
+    {
+        try {
+            $this->operationObserver()->succeeded($operation, $previousState);
+        } catch (Throwable $exception) {
+            $this->logObserverFailure('succeeded', $operation, $exception);
+        }
+    }
+
+    protected function operationLogicalPath(string $path): string
+    {
+        $path = str_replace('\\', '/', $path);
+        $root = rtrim(str_replace('\\', '/', (string) $this->typeDir), '/');
+        $path = preg_replace('#/+#', '/', $path) ?? $path;
+        $root = preg_replace('#/+#', '/', $root) ?? $root;
+        if ($root !== '' && ($path === $root || str_starts_with($path, $root . '/'))) {
+            $path = substr($path, strlen($root));
+        } else {
+            $path = trim($path, '/');
+            if ($path === $this->type) {
+                $path = '';
+            } elseif (str_starts_with($path, $this->type . '/')) {
+                $path = substr($path, strlen($this->type) + 1);
+            }
+        }
+        $segments = array_values(array_filter(
+            explode('/', trim($path, '/')),
+            static fn (string $segment): bool => $segment !== '' && $segment !== '.'
+        ));
+        return LogicalPath::fromString('/' . implode('/', $segments))->value();
+    }
+
+    private function operationObserver(): OperationObserverInterface
+    {
+        if (!$this->operationObserver instanceof OperationObserverInterface) {
+            $this->operationObserver = new NullOperationObserver();
+        }
+        return $this->operationObserver;
+    }
+
+    private function logObserverFailure(string $phase, OperationContext $operation, Throwable $exception): void
+    {
+        error_log(sprintf(
+            'KCFinder operation observer failed during %s for %s: %s',
+            $phase,
+            $operation->operation,
+            $exception->getMessage()
+        ));
     }
 
     /**
@@ -639,7 +715,7 @@ class uploader
     {
         $rPath = $this->realpath($file);
         $rPath = rtrim($rPath, '/') . '/';
-        $baseDir = rtrim($this->typeDir, '/') . '/';
+        $baseDir = rtrim(str_replace('\\', '/', $this->typeDir), '/') . '/';
         return (substr($rPath, 0, strlen($baseDir)) === $baseDir);
     }
 

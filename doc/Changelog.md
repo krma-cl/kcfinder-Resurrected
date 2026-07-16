@@ -1,3 +1,12 @@
+4.6.0: 2026-07-15
+-----------------
+* Observador neutral y optativo para operaciones del navegador clásico.
+* Notificaciones de carga, edición, movimiento, renombrado, eliminación y creación de carpetas.
+* Captura previa de estado para operaciones destructivas o que cambian rutas.
+* Eventos individuales para operaciones masivas, sin recorrer nuevamente el almacenamiento.
+* Fallos del observador aislados y registrados sin convertir una mutación exitosa en un falso error.
+* Puente oficial disponible en el adaptador Laravel 1.2.
+
 4.5.0: 2026-07-15
 -----------------
 * Primera versión estable de la línea mantenida por krma-cl.

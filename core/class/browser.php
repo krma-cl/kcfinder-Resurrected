@@ -14,6 +14,7 @@ use Exception;
 use InvalidArgumentException;
 use KCFinder\Application\FileSelectionService;
 use KCFinder\Application\SelectorEnvelope;
+use KCFinder\Domain\OperationContext;
 use KCFinder\Infrastructure\CallbackAuthorization;
 use KCFinder\Infrastructure\LocalFileMetadataReader;
 use KCFinder\Infrastructure\PrefixUrlResolver;
@@ -298,6 +299,12 @@ class browser extends uploader
             $this->errorMsg("A file or folder with that name already exists.");
         if (!@mkdir("$dir/$newDir", $this->config['dirPerms']))
             $this->errorMsg("Cannot create {dir} folder.", array('dir' => $this->htmlData($newDir)));
+        $this->observeSucceeded(new OperationContext(
+            'create_directory',
+            $this->operationLogicalPath("$dir/$newDir"),
+            null,
+            OperationContext::RESOURCE_DIRECTORY
+        ));
         return true;
     }
 
@@ -393,6 +400,10 @@ class browser extends uploader
                     }
                     break;
             }
+            $this->observeSucceeded(new OperationContext(
+                'edit',
+                $this->operationLogicalPath($outputPath)
+            ));
             // Liberar memoria
             if (PHP_VERSION_ID < 80000) {
                 imagedestroy($dst_r);
@@ -518,6 +529,11 @@ class browser extends uploader
                 @unlink($temporary);
                 throw new Exception("Failed to save image.");
             }
+
+            $this->observeSucceeded(new OperationContext(
+                'edit',
+                $this->operationLogicalPath($filePath)
+            ));
 
             return json_encode([
                 'status' => 'success',
@@ -737,6 +753,12 @@ class browser extends uploader
         $ext = file::getExtension($newName);
         if (!$this->validateExtension($ext, $this->type))
             $this->errorMsg("Denied file extension.");
+        $operation = new OperationContext(
+            'rename',
+            $this->operationLogicalPath($file),
+            $this->operationLogicalPath($newName)
+        );
+        $previousState = $this->observeBefore($operation);
         if (!@rename($file, $newName))
             $this->errorMsg("Unknown error.");
 
@@ -745,6 +767,7 @@ class browser extends uploader
 
         if (file_exists($thumbFile))
             @rename($thumbFile, "$thumbDir/" . basename($newName));
+        $this->observeSucceeded($operation, $previousState);
         return true;
     }
 
@@ -763,13 +786,18 @@ class browser extends uploader
             !isset($_POST['file']) ||
             !$this->checkFilename($_POST['file']) ||
             (false === ($file = "$dir/{$_POST['file']}")) ||
-            !file_exists($file) || !is_readable($file) || !file::isWritable($file) ||
-            !@unlink($file)
+            !file_exists($file) || !is_readable($file) || !file::isWritable($file)
         )
+            $this->errorMsg("Unknown error.");
+
+        $operation = new OperationContext('delete', $this->operationLogicalPath($file));
+        $previousState = $this->observeBefore($operation);
+        if (!@unlink($file))
             $this->errorMsg("Unknown error.");
 
         $thumb = "{$this->thumbsTypeDir}/{$_POST['dir']}/{$_POST['file']}";
         if (file_exists($thumb)) @unlink($thumb);
+        $this->observeSucceeded($operation, $previousState);
         return true;
     }
 
@@ -873,9 +901,19 @@ class browser extends uploader
                 $error[] = $this->htmlData($base) . ": " . $this->label("A file or folder with that name already exists.");
             elseif (!is_readable($path) || !is_file($path))
                 $error[] = $this->label("Cannot read '{file}'.", $replace);
-            elseif (!file::isWritable($path) || !@rename($path, "$dir/$base"))
+            elseif (!file::isWritable($path))
                 $error[] = $this->label("Cannot move '{file}'.", $replace);
             else {
+                $operation = new OperationContext(
+                    'move',
+                    $this->operationLogicalPath($path),
+                    $this->operationLogicalPath("$dir/$base")
+                );
+                $previousState = $this->observeBefore($operation);
+                if (!@rename($path, "$dir/$base")) {
+                    $error[] = $this->label("Cannot move '{file}'.", $replace);
+                    continue;
+                }
                 if (function_exists("chmod"))
                     @chmod("$dir/$base", $this->config['filePerms']);
                 $fromThumb = "{$this->thumbsDir}/$file";
@@ -886,6 +924,7 @@ class browser extends uploader
                     $toThumb .= "/$base";
                     @rename($fromThumb, $toThumb);
                 }
+                $this->observeSucceeded($operation, $previousState);
             }
         }
         if (count($error))
@@ -917,11 +956,16 @@ class browser extends uploader
             $replace = array('file' => $this->htmlData($base));
             if (!is_file($path))
                 $error[] = $this->label("The file '{file}' does not exist.", $replace);
-            elseif (!@unlink($path))
-                $error[] = $this->label("Cannot delete '{file}'.", $replace);
             else {
+                $operation = new OperationContext('delete', $this->operationLogicalPath($path));
+                $previousState = $this->observeBefore($operation);
+                if (!@unlink($path)) {
+                    $error[] = $this->label("Cannot delete '{file}'.", $replace);
+                    continue;
+                }
                 $thumb = "{$this->thumbsDir}/$file";
                 if (is_file($thumb)) @unlink($thumb);
+                $this->observeSucceeded($operation, $previousState);
             }
         }
         if (count($error))
@@ -1186,6 +1230,10 @@ class browser extends uploader
             chmod($target, $this->config['filePerms']);
 
         $this->makeThumb($target);
+        $this->observeSucceeded(new OperationContext(
+            'upload',
+            $this->operationLogicalPath($target)
+        ));
         return "/" . basename($target);
     }
 
@@ -1407,6 +1455,10 @@ class browser extends uploader
                 chmod($target, $this->config['filePerms']);
 
             $this->makeThumb($target);
+            $this->observeSucceeded(new OperationContext(
+                'upload',
+                $this->operationLogicalPath($target)
+            ));
             return ['status' => "success", 'msg' => "ok"];
         } catch (Exception $e) {
             error_log($e->getMessage());

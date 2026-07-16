@@ -13,13 +13,14 @@ No es un parche temporal del repositorio histórico: es una línea de continuida
 
 ## Estado del proyecto
 
-- Versión estable: [`v4.5.0`](https://github.com/krma-cl/kcfinder-Resurrected/releases/tag/v4.5.0).
+- Versión estable: [`v4.6.0`](https://github.com/krma-cl/kcfinder-Resurrected/releases/tag/v4.6.0).
 - Paquete Composer: [`krma-cl/kcfinder`](https://packagist.org/packages/krma-cl/kcfinder).
 - Compatibilidad mantenida: PHP 8.2, 8.3, 8.4 y 8.5.
 - Distribución tradicional mediante ZIP autosuficiente.
 - Matriz continua de sintaxis, PHPUnit, PHPStan y validación de artefactos.
 - Selector moderno JSON opt-in, sin retirar el selector heredado.
 - Adaptadores oficiales, versionados de forma independiente, para Laravel y Symfony.
+- Observador operacional optativo para integrar cargas, ediciones, movimientos, renombrados y eliminaciones sin modificar el navegador clásico.
 
 ## Qué es KCFinder
 
@@ -72,7 +73,7 @@ El núcleo, los adaptadores de frameworks y el tema visual se mantienen como pro
 [`krma-cl/kcfinder-laravel`](https://github.com/krma-cl/kcfinder-laravel) integra KCFinder con Laravel 12 y 13, incluyendo Laravel Storage, autorización mediante Gates, publicación de configuración y eventos del selector moderno.
 
 ```bash
-composer require krma-cl/kcfinder-laravel:^1.0
+composer require krma-cl/kcfinder-laravel:^1.2
 ```
 
 El paquete y sus versiones estables están disponibles en [Packagist](https://packagist.org/packages/krma-cl/kcfinder-laravel). Consulte el README del adaptador para publicar su configuración y conectarlo al disco y las reglas de autorización de la aplicación.
@@ -116,6 +117,12 @@ El selector estructurado puede entregar un objeto versionado como el siguiente:
 ```
 
 La activación es opt-in y mantiene la compatibilidad con callbacks heredados. Los callbacks estructurados y el uso seguro de `postMessage` están documentados en [doc/ModernSelector.md](doc/ModernSelector.md).
+
+## Observador de operaciones
+
+La versión 4.6 agrega un contrato neutral y optativo que notifica operaciones exitosas del navegador clásico. La implementación predeterminada no realiza ninguna acción, por lo que las instalaciones existentes conservan exactamente su comportamiento.
+
+Los adaptadores pueden observar cargas, ediciones, movimientos, renombrados, eliminaciones y creación de carpetas sin parchear `browser.php`. Consulte [doc/OperationObservers.md](doc/OperationObservers.md) para configurar el contrato y conocer su política tolerante a fallos.
 
 ## Requisitos
 

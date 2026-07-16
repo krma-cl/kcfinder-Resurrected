@@ -15,10 +15,10 @@ $definition = array(
         'url' => str_replace('\\', '/', $root),
         'options' => array(
             'symlink' => false,
-            'versions' => array('krma-cl/kcfinder' => '4.5.0-dev'),
+            'versions' => array('krma-cl/kcfinder' => '4.6.0-dev'),
         ),
     )),
-    'require' => array('krma-cl/kcfinder' => '4.5.0-dev'),
+    'require' => array('krma-cl/kcfinder' => '4.6.0-dev'),
     'config' => array('allow-plugins' => new stdClass()),
 );
 
