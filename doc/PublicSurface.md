@@ -25,6 +25,27 @@ La arquitectura objetivo se encuentra en [Architecture.md](Architecture.md).
 
 `core/bootstrap.php` es el bootstrap común de `browse.php` y `upload.php`. Carga la integración solicitada mediante `cms`, registra el autoloader y define la validación CSRF heredada.
 
+Una aplicación anfitriona autenticada que ya completó su propio bootstrap puede
+proporcionar opciones confiables y limitadas a la petición mediante
+`$GLOBALS['KCFINDER_RUNTIME_CONFIG']`. Estas opciones se combinan después de
+`conf/config.local.php`, incluidas opciones privadas como
+`_operationObserver`, sin editar archivos dentro de `vendor`:
+
+```php
+$GLOBALS['KCFINDER_RUNTIME_CONFIG'] = array(
+    'disabled' => false,
+    'uploadDir' => '/srv/application/storage/files',
+    'uploadURL' => '/protected/files',
+    '_operationObserver' => $container->get(
+        \KCFinder\Contract\OperationObserverInterface::class
+    ),
+);
+```
+
+Sólo código PHP confiable del servidor debe poblar este arreglo; nunca debe
+construirse directamente desde parámetros HTTP. Las instalaciones tradicionales
+y `conf/config.local.php` conservan su comportamiento.
+
 ## Acciones de `browse.php`
 
 El parámetro GET `act` selecciona un método `act_<acción>` de `kcfinder\browser`. Una acción desconocida vuelve actualmente a `browser`.

@@ -174,4 +174,17 @@ if (isset($_LOCALS)) {
     $_CONFIG = &$_DEFAULTS;
 }
 
+/**
+ * Trusted host applications may provide request-scoped configuration after
+ * their own bootstrap has completed. This avoids editing files inside vendor
+ * while keeping browser requests disabled unless the host explicitly enables
+ * them.
+ */
+if (
+    isset($GLOBALS['KCFINDER_RUNTIME_CONFIG'])
+    && is_array($GLOBALS['KCFINDER_RUNTIME_CONFIG'])
+) {
+    $_CONFIG = array_merge($_CONFIG, $GLOBALS['KCFINDER_RUNTIME_CONFIG']);
+}
+
 return $_CONFIG;

@@ -1,3 +1,8 @@
+4.8.1: 2026-07-17
+-----------------
+* Configuración confiable y limitada a la petición para adaptadores de
+  frameworks, incluido el observador privado, sin editar archivos de `vendor`.
+
 4.8.0: 2026-07-17
 -----------------
 * Eventos neutrales para copias, renombrado de carpetas y eliminación recursiva por archivo y carpeta.

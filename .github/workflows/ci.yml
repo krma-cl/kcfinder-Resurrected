@@ -69,13 +69,13 @@ jobs:
 
       - name: Build reproducible traditional archives
         run: |
-          php tools/build-release.php --version=4.8.0-ci --output-dir=dist/first
-          php tools/build-release.php --version=4.8.0-ci --output-dir=dist/second
-          cmp dist/first/kcfinder-resurrected-4.8.0-ci.zip dist/second/kcfinder-resurrected-4.8.0-ci.zip
+          php tools/build-release.php --version=4.8.1-ci --output-dir=dist/first
+          php tools/build-release.php --version=4.8.1-ci --output-dir=dist/second
+          cmp dist/first/kcfinder-resurrected-4.8.1-ci.zip dist/second/kcfinder-resurrected-4.8.1-ci.zip
 
       - name: Verify traditional and Composer installations
         run: |
-          php tools/verify-release.php dist/first/kcfinder-resurrected-4.8.0-ci.zip
+          php tools/verify-release.php dist/first/kcfinder-resurrected-4.8.1-ci.zip
           php tools/verify-composer-install.php
           composer archive --format=zip --dir=dist/composer --file=kcfinder-composer
           php tools/verify-composer-archive.php dist/composer/kcfinder-composer.zip
@@ -83,7 +83,7 @@ jobs:
       - name: Prepare CI artifact
         run: |
           mkdir -p dist/artifact
-          cp dist/first/kcfinder-resurrected-4.8.0-ci.zip* dist/artifact/
+          cp dist/first/kcfinder-resurrected-4.8.1-ci.zip* dist/artifact/
 
       - name: Upload verified archive
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
