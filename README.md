@@ -13,8 +13,8 @@ No es un parche temporal del repositorio histórico: es una línea de continuida
 
 ## Estado del proyecto
 
-- Versión estable: `v4.8.1` (preparación); último release publicado:
-  [`v4.8.0`](https://github.com/krma-cl/kcfinder-Resurrected/releases/tag/v4.8.0).
+- Versión estable: `v4.9.0` (preparación); último release publicado:
+  [`v4.8.1`](https://github.com/krma-cl/kcfinder-Resurrected/releases/tag/v4.8.1).
 - Paquete Composer: [`krma-cl/kcfinder`](https://packagist.org/packages/krma-cl/kcfinder).
 - Compatibilidad mantenida: PHP 8.2, 8.3, 8.4 y 8.5.
 - Distribución tradicional mediante ZIP autosuficiente.

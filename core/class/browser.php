@@ -72,7 +72,7 @@ class browser extends uploader
             }
         }
 
-        if (isset($_GET['theme']) && $this->checkFilename($_GET['theme']) && is_dir("themes/{$_GET['theme']}"))
+        if (isset($_GET['theme']) && $this->checkFilename($_GET['theme']) && $this->themeDirectory($_GET['theme']) !== false)
             $this->config['theme'] = $_GET['theme'];
     }
 
@@ -1252,10 +1252,10 @@ class browser extends uploader
     {
         if ($file !== null) {
             $ext = file::getExtension($file);
-            $thumb = "themes/{$this->config['theme']}/img/files/big/$ext.png";
+            $thumb = $this->themeFile("img/files/big/$ext.png");
         }
         if (!isset($thumb) || !file_exists($thumb))
-            $thumb = "themes/{$this->config['theme']}/img/files/big/_.png";
+            $thumb = $this->themeFile("img/files/big/_.png");
         header("Content-Type: image/png");
         readfile($thumb);
         die;
@@ -1323,8 +1323,8 @@ class browser extends uploader
             if ($stat === false) continue;
             $name = basename($file);
             $ext = file::getExtension($file);
-            $bigIcon = file_exists("themes/{$this->config['theme']}/img/files/big/$ext.png");
-            $smallIcon = file_exists("themes/{$this->config['theme']}/img/files/small/$ext.png");
+            $bigIcon = file_exists((string) $this->themeFile("img/files/big/$ext.png"));
+            $smallIcon = file_exists((string) $this->themeFile("img/files/small/$ext.png"));
             $thumb = file_exists("$thumbDir/$name");
             if ($type && count($size) >= 2)
                 list($width, $height) = $size;

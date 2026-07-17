@@ -46,6 +46,18 @@ Sólo código PHP confiable del servidor debe poblar este arreglo; nunca debe
 construirse directamente desde parámetros HTTP. Las instalaciones tradicionales
 y `conf/config.local.php` conservan su comportamiento.
 
+Los temas instalados como paquetes Composer separados pueden registrarse sin
+copiarse dentro del paquete del núcleo:
+
+```php
+$GLOBALS['KCFINDER_RUNTIME_CONFIG']['_themeRoots'] = array(
+    'bootstrap5' => '/application/vendor/krma-cl/kcfinder-bootstrap5-theme/dist/bootstrap5',
+);
+```
+
+Las URLs conservan el contrato `themes/<nombre>/...`; la aplicación anfitriona
+debe publicar o servir esa misma distribución bajo su ruta controlada.
+
 ## Acciones de `browse.php`
 
 El parámetro GET `act` selecciona un método `act_<acción>` de `kcfinder\browser`. Una acción desconocida vuelve actualmente a `browser`.

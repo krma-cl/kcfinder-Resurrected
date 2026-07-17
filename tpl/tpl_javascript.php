@@ -11,7 +11,7 @@ if ($this->opener['name'] == "tinymce") :
 <?php
 endif;
 
-if (file_exists("themes/{$this->config['theme']}/js.php")) :
+if (file_exists((string) $this->themeFile("js.php"))) :
 ?>
     <script src="themes/<?= $this->config['theme'] ?>/js.php" type="text/javascript"></script>
 <?php
