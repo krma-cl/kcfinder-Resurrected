@@ -36,6 +36,7 @@ El parámetro GET `act` selecciona un método `act_<acción>` de `kcfinder\brows
 | `select` | POST | No | Sí | Sobre JSON v1 con metadatos verificados |
 | `thumb` | GET | Puede crear caché | No | Imagen |
 | `expand` | POST | No | Sí | JSON con carpetas |
+| `search` | POST | No | Sí | JSON con árbol reducido de carpetas coincidentes |
 | `chDir` | POST | Sesión | Sí | JSON con archivos y permisos |
 | `newDir` | POST | Sí | Sí | JSON vacío o error |
 | `crop` | POST | Sí | Sí | JSON |
@@ -107,6 +108,7 @@ La configuración se obtiene de `conf/config.php`, puede ser complementada por `
 Superficies que deben conservar una ruta de migración:
 
 - `disabled`, `uploadURL`, `uploadDir`, `theme` y `lang`.
+- `search`, que habilita y acota la búsqueda optativa por nombres.
 - `types` y opciones específicas por tipo.
 - `imageDriversPriority`, dimensiones, calidad y miniaturas.
 - `allowExts` y `allowMimeTypes`.

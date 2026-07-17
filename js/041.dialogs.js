@@ -233,8 +233,8 @@ _.imageCropDialog = function (post, labels, callBack) {
                         primary: "ui-icon-check"
                     },
                     click: function () {
-                        if (callBack) callBack();
-                        dlg.dialog("destroy").detach();
+                        if (!callBack || callBack() !== false)
+                            dlg.dialog("destroy").detach();
                     }
                 },
                 {

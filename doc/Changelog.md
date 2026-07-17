@@ -1,3 +1,10 @@
+4.7.0: 2026-07-17
+-----------------
+* Búsqueda optativa por nombres de carpetas y archivos, con árbol y lista filtrados.
+* Límites configurables de resultados, entradas examinadas, tiempo y espera entre consultas.
+* Corrección del recorte de imágenes cuando la selección visual produce coordenadas decimales o levemente fuera del lienzo.
+* Campo de búsqueda accesible por teclado y adaptable al panel móvil de carpetas.
+
 4.6.0: 2026-07-15
 -----------------
 * Observador neutral y optativo para operaciones del navegador clásico.

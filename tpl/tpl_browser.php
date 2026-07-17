@@ -8,13 +8,33 @@
     <?php include "tpl/tpl_javascript.php" ?>
 </head>
 
-<body>
+<body<?= !empty($search['enabled']) ? ' class="search-enabled"' : '' ?>>
     <div id="resizer"></div>
     <div id="menu"></div>
     <div id="clipboard"></div>
     <div id="all">
 
         <div id="left">
+            <?php if (!empty($search['enabled'])) : ?>
+                <div id="folderSearch">
+                    <label for="folderSearchInput"><?= $this->label("Search folders and files") ?></label>
+                    <input
+                        id="folderSearchInput"
+                        type="search"
+                        maxlength="100"
+                        autocomplete="off"
+                        placeholder="<?= htmlspecialchars($this->label("Search..."), ENT_QUOTES, $this->charset) ?>"
+                        aria-controls="folders"
+                    />
+                    <button
+                        id="folderSearchClear"
+                        type="button"
+                        aria-label="<?= htmlspecialchars($this->label("Clear search"), ENT_QUOTES, $this->charset) ?>"
+                        title="<?= htmlspecialchars($this->label("Clear search"), ENT_QUOTES, $this->charset) ?>"
+                    >&times;</button>
+                    <div id="folderSearchStatus" role="status" aria-live="polite"></div>
+                </div>
+            <?php endif; ?>
             <div id="folders"></div>
         </div>
         <div id="foldersBackdrop" aria-hidden="true"></div>

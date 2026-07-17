@@ -21,5 +21,11 @@ var _ = {
         targetOrigin: null,
         error: null
     },
+    search: {
+        enabled: false,
+        minChars: 2,
+        maxResults: 100,
+        debounceMs: 350
+    },
     scrollbarWidth: 20
 };

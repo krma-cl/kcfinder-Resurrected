@@ -31,6 +31,7 @@ endif;
     _.thumbsURL = _.uploadURL + "/<?= text::jsValue($this->config['thumbsDir']) ?>";
     _.opener = <?= json_encode($this->opener) ?>;
     _.selector = <?= json_encode($this->selector, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    _.search = <?= json_encode($search, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     _.cms = "<?= text::jsValue($this->cms) ?>";
     _.dropUploadMaxFilesize = <?= isset($this->config['_dropUploadMaxFilesize']) ? intVal($this->config['_dropUploadMaxFilesize']) : "10485760" ?>;
     _.langs = <?= json_encode($this->getLangs()) ?>;

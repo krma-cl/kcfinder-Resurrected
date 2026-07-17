@@ -53,6 +53,73 @@ table {
     overflow: auto;
 }
 
+#folderSearch {
+    position: relative;
+    margin: 5px 5px 0;
+}
+
+#folderSearch label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+#folderSearchInput {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 32px;
+    padding: 5px 30px 5px 8px;
+}
+
+#folderSearchClear {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+#folderSearchInput:placeholder-shown + #folderSearchClear {
+    display: none;
+}
+
+#folderSearchStatus {
+    min-height: 15px;
+    padding: 2px 2px 0;
+    font-size: 11px;
+}
+
+#folderSearchStatus:empty {
+    display: none;
+}
+
+#folders a.search-match > span.folder {
+    font-weight: bold;
+}
+
+#folders .search-file-count {
+    display: inline-block;
+    min-width: 16px;
+    margin-left: 5px;
+    padding: 0 3px;
+    text-align: center;
+    font-size: 10px;
+}
+
+#folders .search-empty {
+    padding: 10px 5px;
+}
+
 #toolbar {
     padding: 5px;
 }

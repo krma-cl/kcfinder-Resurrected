@@ -123,7 +123,7 @@ class browser extends uploader
             if ($this->checkFilePath($dir) && is_dir($dir) && is_readable($dir))
                 $this->session['dir'] = path::normalize("{$this->type}/{$_GET['dir']}");
         }
-        return $this->output();
+        return $this->output(array('search' => $this->searchOptions()));
     }
 
     protected function act_init()
@@ -256,6 +256,40 @@ class browser extends uploader
             die($csrfResp);
         }
         return json_encode(array('dirs' => $this->getDirs($this->postDir())));
+    }
+
+    protected function act_search()
+    {
+        $options = $this->searchOptions();
+        if (!$options['enabled']) {
+            return json_encode(array('error' => $this->label("Search is not enabled.")));
+        }
+
+        $csrfResp = validateCSRF($_POST['csrf_token'] ?? '');
+        if ($csrfResp !== true) {
+            return json_encode(array('error' => $this->label($csrfResp)));
+        }
+
+        $query = $_POST['query'] ?? null;
+        if (!is_string($query)) {
+            return json_encode(array('error' => $this->label("Invalid search query.")));
+        }
+
+        $query = trim($query);
+        $queryLength = function_exists('mb_strlen')
+            ? mb_strlen($query, $this->charset)
+            : strlen($query);
+        if (
+            $queryLength < $options['minChars'] ||
+            $queryLength > 100
+        ) {
+            return json_encode(array('error' => $this->label("Invalid search query.")));
+        }
+
+        return json_encode(
+            $this->searchDirectoryTree($query, $options),
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        );
     }
 
     protected function act_chDir()
@@ -1331,6 +1365,192 @@ class browser extends uploader
             return false;
 
         return $dirs;
+    }
+
+    private function searchOptions()
+    {
+        $configured = isset($this->config['search']) && is_array($this->config['search'])
+            ? $this->config['search']
+            : array();
+
+        return array(
+            'enabled' => !empty($configured['enabled']),
+            'minChars' => max(1, min(20, (int) ($configured['minChars'] ?? 2))),
+            'maxResults' => max(1, min(1000, (int) ($configured['maxResults'] ?? 100))),
+            'maxEntries' => max(100, min(1000000, (int) ($configured['maxEntries'] ?? 25000))),
+            'timeoutMs' => max(100, min(10000, (int) ($configured['timeoutMs'] ?? 1500))),
+            'debounceMs' => max(0, min(2000, (int) ($configured['debounceMs'] ?? 350))),
+        );
+    }
+
+    private function searchDirectoryTree($query, array $options)
+    {
+        $root = realpath($this->typeDir);
+        if ($root === false || !is_dir($root) || !is_readable($root)) {
+            return array(
+                'tree' => null,
+                'resultCount' => 0,
+                'scannedEntries' => 0,
+                'truncated' => false,
+            );
+        }
+
+        $root = path::normalize($root);
+        $stack = array(array('physical' => $root, 'relative' => ''));
+        $matches = array();
+        $scannedEntries = 0;
+        $truncated = false;
+        $deadline = microtime(true) + ($options['timeoutMs'] / 1000);
+
+        while (count($stack)) {
+            if (microtime(true) >= $deadline) {
+                $truncated = true;
+                break;
+            }
+
+            $current = array_pop($stack);
+            if ($this->searchContains(basename($current['physical']), $query)) {
+                $matches[$current['relative']]['directory'] = true;
+                $matches[$current['relative']]['files'] = $matches[$current['relative']]['files'] ?? 0;
+                if (count($matches) >= $options['maxResults']) {
+                    $truncated = true;
+                    break;
+                }
+            }
+
+            $entries = dir::content($current['physical'], array(
+                'types' => array('dir', 'file'),
+                'followLinks' => false,
+            ));
+            if (!is_array($entries)) {
+                continue;
+            }
+
+            $childDirectories = array();
+            foreach ($entries as $entry) {
+                if (++$scannedEntries > $options['maxEntries']) {
+                    $truncated = true;
+                    break 2;
+                }
+                if (microtime(true) >= $deadline) {
+                    $truncated = true;
+                    break 2;
+                }
+
+                $name = basename($entry);
+                $relative = ltrim($current['relative'] . '/' . $name, '/');
+
+                if (is_dir($entry)) {
+                    if (is_readable($entry)) {
+                        $childDirectories[] = array(
+                            'physical' => path::normalize($entry),
+                            'relative' => path::normalize($relative),
+                        );
+                    }
+                    continue;
+                }
+
+                if (!$this->searchContains($name, $query)) {
+                    continue;
+                }
+
+                $directory = $current['relative'];
+                if (!isset($matches[$directory])) {
+                    $matches[$directory] = array('directory' => false, 'files' => 0);
+                }
+                $matches[$directory]['files']++;
+                if (count($matches) >= $options['maxResults']) {
+                    $truncated = true;
+                    break 2;
+                }
+            }
+
+            for ($i = count($childDirectories) - 1; $i >= 0; $i--) {
+                $stack[] = $childDirectories[$i];
+            }
+        }
+
+        return array(
+            'tree' => count($matches) ? $this->buildSearchTree($matches) : null,
+            'resultCount' => count($matches),
+            'scannedEntries' => $scannedEntries,
+            'truncated' => $truncated,
+        );
+    }
+
+    private function searchContains($value, $query)
+    {
+        if (function_exists('mb_stripos')) {
+            return mb_stripos($value, $query, 0, $this->charset) !== false;
+        }
+
+        return stripos($value, $query) !== false;
+    }
+
+    private function buildSearchTree(array $matches)
+    {
+        $included = array('' => true);
+        foreach (array_keys($matches) as $relative) {
+            $path = $relative;
+            do {
+                $included[$path] = true;
+                $path = dirname($path);
+                if ($path === '.') {
+                    $path = '';
+                }
+            } while ($path !== '');
+        }
+
+        $children = array();
+        foreach (array_keys($included) as $relative) {
+            if ($relative === '') {
+                continue;
+            }
+            $parent = dirname($relative);
+            if ($parent === '.') {
+                $parent = '';
+            }
+            $children[$parent][] = $relative;
+        }
+        foreach ($children as &$paths) {
+            usort($paths, static function ($a, $b) {
+                return dir::fileSort(basename($a), basename($b));
+            });
+        }
+        unset($paths);
+
+        return $this->buildSearchTreeNode('', $children, $matches);
+    }
+
+    private function buildSearchTreeNode($relative, array $children, array $matches)
+    {
+        $physical = $this->typeDir . (strlen($relative) ? '/' . $relative : '');
+        $info = $this->getDirInfo($physical);
+        if ($info === false) {
+            return null;
+        }
+
+        $info['hasDirs'] = !empty($children[$relative]);
+        $info['searchMatch'] = isset($matches[$relative]);
+        $info['matchedFiles'] = isset($matches[$relative])
+            ? $matches[$relative]['files']
+            : 0;
+
+        if (!empty($children[$relative])) {
+            $info['dirs'] = array();
+            foreach ($children[$relative] as $child) {
+                $node = $this->buildSearchTreeNode($child, $children, $matches);
+                if ($node !== null) {
+                    $info['dirs'][] = $node;
+                }
+            }
+            if (!count($info['dirs'])) {
+                unset($info['dirs']);
+                $info['hasDirs'] = false;
+            }
+        }
+
+        return $info;
     }
 
     private function postDir($existent = true)

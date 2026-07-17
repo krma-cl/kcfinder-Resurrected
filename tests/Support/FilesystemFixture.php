@@ -162,6 +162,21 @@ final class CharacterizationBrowser extends kcfinder\browser
         return json_decode($this->act_select(), true, 512, JSON_THROW_ON_ERROR);
     }
 
+    public function searchFixture(array $request, array $options = array()): array
+    {
+        $this->config['search'] = array_merge(array(
+            'enabled' => true,
+            'minChars' => 2,
+            'maxResults' => 100,
+            'maxEntries' => 25000,
+            'timeoutMs' => 1500,
+            'debounceMs' => 350,
+        ), $options);
+        $_POST = $request;
+
+        return json_decode($this->act_search(), true, 512, JSON_THROW_ON_ERROR);
+    }
+
     protected function checkUploadedFile($aFile = array(), $Check_isuploaded = true)
     {
         return parent::checkUploadedFile($aFile, false);

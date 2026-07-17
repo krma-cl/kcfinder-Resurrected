@@ -15,6 +15,16 @@ $_DEFAULTS = array(
     'theme' => "default",
     'lang' => "es",
 
+    // OPTIONAL FOLDER AND FILE NAME SEARCH
+    'search' => array(
+        'enabled' => false,
+        'minChars' => 2,
+        'maxResults' => 100,
+        'maxEntries' => 25000,
+        'timeoutMs' => 1500,
+        'debounceMs' => 350,
+    ),
+
     'types' => array(
         // (F)CKEditor types
         'files'   =>  "",

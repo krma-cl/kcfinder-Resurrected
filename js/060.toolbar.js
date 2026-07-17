@@ -56,7 +56,7 @@ _.initToolbar = function () {
             '<div class="head">KCFinder ' + _.version + '</div>';
         html +=
             '<div>' + _.label("Licenses:") + ' <a href="http://opensource.org/licenses/GPL-3.0" target="_blank">GPLv3</a> & <a href="http://opensource.org/licenses/LGPL-3.0" target="_blank">LGPLv3</a></div>' +
-            '<div>Esta bifurcación es administrada por DevCrh &copy; ' + now.getFullYear() + '</div>' +
+            '<div>Esta versión es administrada por Krma-cl &copy; ' + now.getFullYear() + '</div>' +
             '<div></div>';
         var dlg = _.dialog(_.label("About"), html, {
             width: 301
@@ -332,7 +332,10 @@ _.refresh = function (selected) {
                 return;
             }
             _.dirWritable = data.dirWritable;
-            _.files = data.files ? data.files : [];
+            _.searchOriginalFiles = data.files ? data.files.slice(0) : [];
+            _.files = _.searchActive
+                ? _.filterSearchFiles(_.searchOriginalFiles)
+                : _.searchOriginalFiles;
             _.orderFiles(null, selected);
             _.statusDir();
         },

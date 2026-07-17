@@ -48,7 +48,9 @@ _.setTreeData = function (data, path) {
         readable: data.readable,
         writable: data.writable,
         removable: data.removable,
-        hasDirs: data.hasDirs
+        hasDirs: data.hasDirs,
+        searchMatch: !!data.searchMatch,
+        matchedFiles: data.matchedFiles || 0
     });
     $(selector + ' span.folder').addClass(data.current ? 'current' : 'regular');
     if (data.dirs && data.dirs.length) {
@@ -63,7 +65,12 @@ _.setTreeData = function (data, path) {
 _.buildTree = function (root, path) {
     if (!path) path = "";
     path += root.name;
-    var cdir, html = '<div class="folder"><a href="kcdir:/' + $.$.escapeDirs(path) + '"><span class="brace">&nbsp;</span><span class="folder">' + $.$.htmlData(root.name) + '</span></a>';
+    var cdir,
+        matchClass = root.searchMatch ? ' search-match' : '',
+        html = '<div class="folder"><a class="' + matchClass + '" href="kcdir:/' + $.$.escapeDirs(path) + '"><span class="brace">&nbsp;</span><span class="folder">' + $.$.htmlData(root.name) + '</span>';
+    if (root.matchedFiles)
+        html += '<span class="search-file-count" title="' + $.$.htmlValue(_.label("{count} matching files", {count: root.matchedFiles})) + '">' + root.matchedFiles + '</span>';
+    html += '</a>';
     if (root.dirs) {
         html += '<div class="folders">';
         for (var i = 0; i < root.dirs.length; i++) {
@@ -162,9 +169,12 @@ _.changeDir = function (dir) {
             success: function (data) {
                 if (_.check4errors(data))
                     return;
-                _.files = data.files;
-                _.orderFiles();
                 _.dir = dir.data('path');
+                _.searchOriginalFiles = data.files ? data.files.slice(0) : [];
+                _.files = _.searchActive
+                    ? _.filterSearchFiles(_.searchOriginalFiles)
+                    : _.searchOriginalFiles;
+                _.orderFiles();
                 _.dirWritable = data.dirWritable;
                 _.setTitle("KCFinder: /" + _.dir);
                 _.statusDir();
@@ -187,6 +197,11 @@ _.statusDir = function () {
 };
 
 _.refreshDir = function (dir) {
+    if (_.searchActive) {
+        _.runSearch(_.searchQuery);
+        return true;
+    }
+
     var path = dir.data('path');
     if (dir.children('.brace').hasClass('opened') || dir.children('.brace').hasClass('closed'))
         dir.children('.brace').removeClass('opened').addClass('closed');

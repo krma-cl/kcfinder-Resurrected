@@ -55,4 +55,20 @@ final class ResponsiveBrowserSurfaceTest extends TestCase
         self::assertStringContainsString('_.positionUploadButton();', $controller);
         self::assertMatchesRegularExpression('/\$\(\x27#lang\x27\)\.transForm\(\);\s+_.resize\(\);/', $toolbar);
     }
+
+    public function testOptionalSearchSurfaceSupportsDebounceEnterAndEscape(): void
+    {
+        $template = file_get_contents(dirname(__DIR__) . '/tpl/tpl_browser.php');
+        $search = file_get_contents(dirname(__DIR__) . '/js/092.search.js');
+
+        self::assertIsString($template);
+        self::assertIsString($search);
+        self::assertStringContainsString('id="folderSearchInput"', $template);
+        self::assertStringContainsString("event.key === 'Enter'", $search);
+        self::assertStringContainsString("event.key === 'Escape'", $search);
+        self::assertStringContainsString('_.search.debounceMs', $search);
+        self::assertStringContainsString('_.searchRequest.abort()', $search);
+        self::assertStringContainsString('_.filterSearchFiles', $search);
+        self::assertStringContainsString('directoryName.indexOf(query)', $search);
+    }
 }

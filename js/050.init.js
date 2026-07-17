@@ -18,6 +18,7 @@ _.init = function () {
     _.initOpeners();
     _.initSettings();
     _.initContent();
+    _.initSearch();
     _.initToolbar();
     _.initResponsive();
     _.initResizer();
@@ -124,6 +125,12 @@ _.initResponsive = function () {
         if (!_.isNarrowViewport() || !$('body').hasClass('folders-drawer-open'))
             return;
         if (event.key === 'Escape' || event.keyCode === 27) {
+            if (
+                event.target &&
+                event.target.id === 'folderSearchInput' &&
+                $.trim(event.target.value).length
+            )
+                return;
             event.preventDefault();
             _.closeFolders(true);
             return;
@@ -238,6 +245,7 @@ _.initContent = function () {
             _.setTitle("KCFinder Resurrected: /" + _.dir);
             _.initFolders();
             _.files = data.files ? data.files : [];
+            _.searchOriginalFiles = null;
             _.orderFiles();
         },
         error: function () {
@@ -338,7 +346,7 @@ _.resize = function () {
 
     jResizer.css('height', $(window).height());
 
-    jFolders.css('height', jLeft.outerHeight() - jFolders.outerVSpace());
+    _.fixFoldersHeight();
     _.fixFilesHeight();
     jStatus.css('width', (_.isNarrowViewport() ? jWindow.width() : jLeft.outerWidth() + jRight.outerWidth()) - jStatus.outerHSpace('p'));
     jFiles.css('width', jRight.innerWidth() - jFiles.outerHSpace());
@@ -348,6 +356,16 @@ _.resize = function () {
     });
     _.positionUploadButton();
     _.fixScrollRadius();
+};
+
+_.fixFoldersHeight = function () {
+    var jLeft = $('#left'),
+        jFolders = $('#folders'),
+        searchHeight = $('#folderSearch').length
+            ? $('#folderSearch').outerHeight(true)
+            : 0;
+
+    jFolders.css('height', jLeft.outerHeight() - jFolders.outerVSpace() - searchHeight);
 };
 
 _.setTitle = function (title) {
