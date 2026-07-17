@@ -25,7 +25,8 @@ var _ = {
         enabled: false,
         minChars: 2,
         maxResults: 100,
-        debounceMs: 350
+        debounceMs: 350,
+        scope: 'global'
     },
     scrollbarWidth: 20
 };

@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 require_once dirname(__DIR__) . '/core/bootstrap.php';
+require_once dirname(__DIR__) . '/integration/security.php';
 
 final class CsrfValidationTest extends TestCase
 {
@@ -55,5 +56,14 @@ final class CsrfValidationTest extends TestCase
         $_COOKIE['kcCsrf'] = 'token';
 
         self::assertTrue(validateCSRF('token'));
+    }
+
+    public function testNewTokenIsAvailableDuringTheIssuingRequest(): void
+    {
+        \kcfinder\synchronize_csrf_token('first-request-token');
+
+        self::assertSame('first-request-token', $_SESSION['kcCsrf']);
+        self::assertSame('first-request-token', $_COOKIE['kcCsrf']);
+        self::assertTrue(validateCSRF('first-request-token'));
     }
 }

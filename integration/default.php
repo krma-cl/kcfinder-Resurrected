@@ -52,8 +52,8 @@ class Default_kcfinderPlugin
                 $_SESSION['KCFINDER']['access'] = array('files' => array('upload' => true, 'delete' => true, 'copy' => false, 'move' => true, 'rename' => true), 'dirs' => array('create' => true, 'delete' => true, 'rename' => true));
                 // CSRF Token
                 $token = bin2hex(random_bytes(100));
-                $_SESSION['kcCsrf'] = $token;
                 setcookie('kcCsrf', $token, 0, '/', self::cookieDomain());
+                \kcfinder\synchronize_csrf_token($token);
             } else {
                 self::$authenticated = false;
                 \kcfinder\revoke_access();

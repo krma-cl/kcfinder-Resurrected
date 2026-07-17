@@ -67,7 +67,10 @@ _.buildTree = function (root, path) {
     path += root.name;
     var cdir,
         matchClass = root.searchMatch ? ' search-match' : '',
-        html = '<div class="folder"><a class="' + matchClass + '" href="kcdir:/' + $.$.escapeDirs(path) + '"><span class="brace">&nbsp;</span><span class="folder">' + $.$.htmlData(root.name) + '</span>';
+        searchTitle = root.searchPath
+            ? ' title="' + $.$.htmlValue(root.searchPath) + '"'
+            : '',
+        html = '<div class="folder"><a class="' + matchClass + '"' + searchTitle + ' href="kcdir:/' + $.$.escapeDirs(path) + '"><span class="brace">&nbsp;</span><span class="folder">' + $.$.htmlData(root.name) + '</span>';
     if (root.matchedFiles)
         html += '<span class="search-file-count" title="' + $.$.htmlValue(_.label("{count} matching files", {count: root.matchedFiles})) + '">' + root.matchedFiles + '</span>';
     html += '</a>';

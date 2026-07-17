@@ -15,6 +15,7 @@ final readonly class OperationContext implements JsonSerializable
     private const OPERATIONS = array(
         'upload',
         'edit',
+        'copy',
         'move',
         'rename',
         'delete',
@@ -36,11 +37,14 @@ final readonly class OperationContext implements JsonSerializable
         if (!in_array($resource, array(self::RESOURCE_FILE, self::RESOURCE_DIRECTORY), true)) {
             throw new InvalidArgumentException('The observed resource type is not supported.');
         }
-        if ($resource === self::RESOURCE_DIRECTORY && $operation !== 'create_directory') {
-            throw new InvalidArgumentException('Only directory creation is currently observable.');
+        if (
+            $resource === self::RESOURCE_DIRECTORY
+            && !in_array($operation, array('create_directory', 'move', 'rename', 'delete'), true)
+        ) {
+            throw new InvalidArgumentException('The observed directory operation is not supported.');
         }
-        if (in_array($operation, array('move', 'rename'), true) !== ($targetPath !== null)) {
-            throw new InvalidArgumentException('Move and rename operations require a target path only.');
+        if (in_array($operation, array('copy', 'move', 'rename'), true) !== ($targetPath !== null)) {
+            throw new InvalidArgumentException('Copy, move and rename operations require a target path only.');
         }
         $this->path = LogicalPath::fromString($path)->value();
         $this->targetPath = $targetPath === null ? null : LogicalPath::fromString($targetPath)->value();

@@ -1,3 +1,10 @@
+4.8.0: 2026-07-17
+-----------------
+* Eventos neutrales para copias, renombrado de carpetas y eliminación recursiva por archivo y carpeta.
+* El token CSRF recién emitido queda disponible durante la primera petición, sin requerir una recarga.
+* Búsqueda con alcance global o carpeta actual, rutas contextuales y contadores separados.
+* Las respuestas de búsqueda explican si fueron limitadas por resultados, entradas examinadas o tiempo.
+
 4.7.0: 2026-07-17
 -----------------
 * Búsqueda optativa por nombres de carpetas y archivos, con árbol y lista filtrados.

@@ -38,7 +38,10 @@ final class SearchActionTest extends TestCase
         $nodes = $this->flattenTree($result['tree']);
 
         self::assertSame(2, $result['resultCount']);
+        self::assertSame(1, $result['matchedDirectories']);
+        self::assertSame(1, $result['matchedFiles']);
         self::assertFalse($result['truncated']);
+        self::assertNull($result['truncatedBy']);
         self::assertArrayHasKey('files/contracts', $nodes);
         self::assertTrue($nodes['files/contracts']['searchMatch']);
         self::assertSame(0, $nodes['files/contracts']['matchedFiles']);
@@ -60,6 +63,7 @@ final class SearchActionTest extends TestCase
 
         self::assertSame(1, $result['resultCount']);
         self::assertTrue($result['truncated']);
+        self::assertSame('maxResults', $result['truncatedBy']);
     }
 
     public function testTypeRootCanMatchByItsFolderName(): void
@@ -99,6 +103,26 @@ final class SearchActionTest extends TestCase
             $this->fixture->root(),
             json_encode($result, JSON_THROW_ON_ERROR)
         );
+    }
+
+    public function testSearchCanBeLimitedToTheCurrentDirectory(): void
+    {
+        $this->fixture->createTypeDirectory('current');
+        $this->fixture->createTypeDirectory('outside');
+        $this->fixture->writeTypeFile('current/report-current.txt', 'current');
+        $this->fixture->writeTypeFile('outside/report-outside.txt', 'outside');
+        $this->fixture->browser()->setFixtureDirectory('files/current');
+
+        $result = $this->fixture->browser()->searchFixture(
+            $this->request('report'),
+            array('scope' => 'current')
+        );
+        $nodes = $this->flattenTree($result['tree']);
+
+        self::assertSame('current', $result['scope']);
+        self::assertArrayHasKey('files/current', $nodes);
+        self::assertArrayNotHasKey('files/outside', $nodes);
+        self::assertSame(1, $result['matchedFiles']);
     }
 
     private function request(string $query): array
