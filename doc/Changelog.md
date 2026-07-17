@@ -1,3 +1,8 @@
+4.9.0: 2026-07-17
+-----------------
+* Raíces externas confiables para temas instalados como paquetes Composer,
+  conservando el directorio tradicional `themes` y sus URLs históricas.
+
 4.8.1: 2026-07-17
 -----------------
 * Configuración confiable y limitada a la petición para adaptadores de

@@ -779,6 +779,42 @@ class uploader
         return is_string($file) && (strpbrk($file, "/\\\0") === false) && (basename($file) === $file);
     }
 
+    /**
+     * Resolve an installed theme without requiring it to live inside this
+     * package. External roots are trusted server-side configuration.
+     */
+    protected function themeDirectory($theme = null)
+    {
+        $theme = $theme === null ? $this->config['theme'] : $theme;
+        if (!$this->checkFilename($theme))
+            return false;
+
+        $internal = "themes/$theme";
+        if (is_dir($internal))
+            return $internal;
+
+        $roots = $this->config['_themeRoots'] ?? array();
+        $external = is_array($roots) && isset($roots[$theme]) && is_string($roots[$theme])
+            ? realpath($roots[$theme])
+            : false;
+
+        return ($external !== false && is_dir($external)) ? $external : false;
+    }
+
+    protected function themeFile($relative, $theme = null)
+    {
+        $directory = $this->themeDirectory($theme);
+        if ($directory === false || !is_string($relative) || str_contains($relative, "\0"))
+            return false;
+
+        $relative = ltrim(str_replace("\\", "/", $relative), "/");
+        if ($relative === '' || str_contains("/$relative/", "/../"))
+            return false;
+
+        return rtrim($directory, "/\\") . DIRECTORY_SEPARATOR
+            . str_replace("/", DIRECTORY_SEPARATOR, $relative);
+    }
+
     protected function imageResize($image, $file = null)
     {
 
