@@ -378,6 +378,9 @@ Cada decisión con impacto público debe registrarse como un ADR corto antes de 
 4. Compatibilidad inicial de versiones de Laravel y Symfony.
 5. Política de URLs públicas, temporales y firmadas.
 6. Separación exacta entre assets del núcleo y temas.
+7. Migración gradual de jQuery 3.7 y jQuery UI 1.13 hacia jQuery 4 y jQuery UI 1.14, incluyendo la eliminación de APIs retiradas y de solicitudes XHR síncronas.
+
+La modernización del frontend se tratará como una línea independiente y compatible. El plan técnico, las incompatibilidades conocidas y su validación se mantienen en [FrontendModernization.md](FrontendModernization.md).
 
 ## 20. Regla para aceptar cambios
 

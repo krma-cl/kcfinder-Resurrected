@@ -60,8 +60,8 @@
             "@phpstan"
         ],
         "package": [
-            "@php tools/build-release.php --version=4.6.0-dev",
-            "@php tools/verify-release.php dist/kcfinder-resurrected-4.6.0-dev.zip",
+            "@php tools/build-release.php --version=4.7.0-dev",
+            "@php tools/verify-release.php dist/kcfinder-resurrected-4.7.0-dev.zip",
             "@composer archive --format=zip --dir=dist/composer --file=kcfinder-composer",
             "@php tools/verify-composer-archive.php dist/composer/kcfinder-composer.zip"
         ]

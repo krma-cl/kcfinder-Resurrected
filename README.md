@@ -13,7 +13,7 @@ No es un parche temporal del repositorio histórico: es una línea de continuida
 
 ## Estado del proyecto
 
-- Versión estable: [`v4.6.0`](https://github.com/krma-cl/kcfinder-Resurrected/releases/tag/v4.6.0).
+- Versión estable: [`v4.7.0`](https://github.com/krma-cl/kcfinder-Resurrected/releases/tag/v4.7.0).
 - Paquete Composer: [`krma-cl/kcfinder`](https://packagist.org/packages/krma-cl/kcfinder).
 - Compatibilidad mantenida: PHP 8.2, 8.3, 8.4 y 8.5.
 - Distribución tradicional mediante ZIP autosuficiente.
@@ -47,6 +47,23 @@ KCFinder es un administrador de archivos web de código abierto que puede integr
 En pantallas menores a 768 píxeles, el árbol de carpetas se transforma en un panel lateral accesible desde el botón **Carpetas**. El panel se cierra al elegir una carpeta, tocar el fondo o presionar `Escape`; además, conserva el foco dentro del panel mientras está abierto y lo devuelve al botón al cerrarse.
 
 El comportamiento forma parte del núcleo y funciona con el tema clásico. Los temas opcionales pueden adaptar su presentación sin sustituir el controlador responsivo ni introducir una dependencia obligatoria en Bootstrap.
+
+## Búsqueda de carpetas y archivos
+
+La búsqueda por nombre es optativa y está desactivada de forma predeterminada. Cuando se habilita, filtra el árbol para mostrar las carpetas cuyo nombre coincide o que contienen archivos coincidentes, conservando sus carpetas antecesoras. La ventana de archivos aplica el mismo término dentro de la carpeta activa.
+
+```php
+'search' => array(
+    'enabled' => true,
+    'minChars' => 2,
+    'maxResults' => 100,
+    'maxEntries' => 25000,
+    'timeoutMs' => 1500,
+    'debounceMs' => 350,
+),
+```
+
+La búsqueda compara nombres, no el contenido interno de documentos. Sus límites, comportamiento de teclado y consideraciones para bibliotecas grandes se explican en [doc/Search.md](doc/Search.md).
 
 ## Instalación
 
