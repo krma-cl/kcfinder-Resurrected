@@ -83,7 +83,7 @@ jobs:
       - name: Prepare CI artifact
         run: |
           mkdir -p dist/artifact
-          cp dist/first/kcfinder-resurrected-4.5.0-ci.zip* dist/artifact/
+          cp dist/first/kcfinder-resurrected-4.7.0-ci.zip* dist/artifact/
 
       - name: Upload verified archive
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
