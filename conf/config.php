@@ -23,6 +23,7 @@ $_DEFAULTS = array(
         'maxEntries' => 25000,
         'timeoutMs' => 1500,
         'debounceMs' => 350,
+        'scope' => 'global',
     ),
 
     'types' => array(

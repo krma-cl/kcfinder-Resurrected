@@ -1,6 +1,6 @@
 # Observadores de operaciones
 
-KCFinder 4.6 permite conectar auditoría, catálogos y adaptadores de frameworks con las operaciones del navegador clásico sin modificar sus controladores. La capacidad es optativa y el observador predeterminado no realiza ninguna acción.
+KCFinder 4.6 permite conectar auditoría, catálogos y adaptadores de frameworks con las operaciones del navegador clásico sin modificar sus controladores. Desde 4.8 también cubre copias y operaciones de carpetas. La capacidad es optativa y el observador predeterminado no realiza ninguna acción.
 
 ## Contrato
 
@@ -39,19 +39,22 @@ El archivo de configuración local es código PHP y puede obtener la instancia d
 |---|---|---|
 | `upload` | archivo | después de guardar y generar la miniatura |
 | `edit` | archivo | después de guardar el resultado de edición o recorte |
+| `copy` | archivo | antes y después de copiar, con ruta de origen y destino |
 | `move` | archivo | antes y después de cambiar la ruta |
 | `rename` | archivo | antes y después de cambiar el nombre |
 | `delete` | archivo | antes y después de eliminar |
 | `create_directory` | carpeta | después de crearla |
+| `rename` | carpeta | antes y después de cambiar el nombre |
+| `delete` | carpeta | después de eliminar sus hijos y la carpeta correspondiente |
 
-Las operaciones masivas notifican cada archivo que efectivamente fue modificado. Los elementos rechazados o fallidos no generan una notificación de éxito.
+Las operaciones masivas notifican cada archivo que efectivamente fue modificado. La eliminación recursiva emite primero los archivos y carpetas hijas y termina con la carpeta solicitada. Los elementos rechazados o fallidos no generan una notificación de éxito.
 
 `OperationContext` contiene:
 
 - `operation`: operación estable;
 - `resource`: `file` o `directory`;
 - `path`: ruta lógica original o actual;
-- `targetPath`: destino para mover o renombrar;
+- `targetPath`: destino para copiar, mover o renombrar;
 - `resultingPath()`: ruta final de la operación.
 
 Las rutas son absolutas dentro del tipo KCFinder seleccionado y nunca exponen la ruta física del servidor.

@@ -611,11 +611,20 @@ class browser extends uploader
             $this->errorMsg("Unallowable characters in folder name.");
         if (substr($newName, 0, 1) == ".")
             $this->errorMsg("Folder name shouldn't begins with '.'");
-        if (!@rename($dir, dirname($dir) . "/$newName"))
+        $targetDir = dirname($dir) . "/$newName";
+        $operation = new OperationContext(
+            'rename',
+            $this->operationLogicalPath($dir),
+            $this->operationLogicalPath($targetDir),
+            OperationContext::RESOURCE_DIRECTORY
+        );
+        $previousState = $this->observeBefore($operation);
+        if (!@rename($dir, $targetDir))
             $this->errorMsg("Cannot rename the folder.");
         $thumbDir = "$this->thumbsTypeDir/{$_POST['dir']}";
         if (is_dir($thumbDir))
             @rename($thumbDir, dirname($thumbDir) . "/$newName");
+        $this->observeSucceeded($operation, $previousState);
         return json_encode(array('name' => $newName));
     }
 
@@ -634,7 +643,7 @@ class browser extends uploader
 
         if (!dir::isWritable($dir))
             $this->errorMsg("Cannot delete the folder.");
-        $result = !dir::prune($dir, false);
+        $result = $this->pruneObservedDirectory($dir);
         if (is_array($result) && count($result))
             $this->errorMsg(
                 "Failed to delete {count} files/folders.",
@@ -875,11 +884,20 @@ class browser extends uploader
                 $error[] = $this->htmlData($base) . ": " . $this->label("A file or folder with that name already exists.");
             elseif (!is_readable($path) || !is_file($path))
                 $error[] = $this->label("Cannot read '{file}'.", $replace);
-            elseif (!@copy($path, "$dir/$base"))
-                $error[] = $this->label("Cannot copy '{file}'.", $replace);
             else {
+                $target = "$dir/$base";
+                $operation = new OperationContext(
+                    'copy',
+                    $this->operationLogicalPath($path),
+                    $this->operationLogicalPath($target)
+                );
+                $previousState = $this->observeBefore($operation);
+                if (!@copy($path, $target)) {
+                    $error[] = $this->label("Cannot copy '{file}'.", $replace);
+                    continue;
+                }
                 if (function_exists("chmod"))
-                    @chmod("$dir/$base", $this->config['filePerms']);
+                    @chmod($target, $this->config['filePerms']);
                 $fromThumb = "{$this->thumbsDir}/$file";
                 if (is_file($fromThumb) && is_readable($fromThumb)) {
                     $toThumb = "{$this->thumbsTypeDir}/{$_POST['dir']}";
@@ -888,6 +906,7 @@ class browser extends uploader
                     $toThumb .= "/$base";
                     @copy($fromThumb, $toThumb);
                 }
+                $this->observeSucceeded($operation, $previousState);
             }
         }
         if (count($error))
@@ -1380,6 +1399,7 @@ class browser extends uploader
             'maxEntries' => max(100, min(1000000, (int) ($configured['maxEntries'] ?? 25000))),
             'timeoutMs' => max(100, min(10000, (int) ($configured['timeoutMs'] ?? 1500))),
             'debounceMs' => max(0, min(2000, (int) ($configured['debounceMs'] ?? 350))),
+            'scope' => ($configured['scope'] ?? 'global') === 'current' ? 'current' : 'global',
         );
     }
 
@@ -1390,21 +1410,40 @@ class browser extends uploader
             return array(
                 'tree' => null,
                 'resultCount' => 0,
+                'matchedDirectories' => 0,
+                'matchedFiles' => 0,
                 'scannedEntries' => 0,
                 'truncated' => false,
+                'truncatedBy' => null,
+                'scope' => $options['scope'],
             );
         }
 
         $root = path::normalize($root);
-        $stack = array(array('physical' => $root, 'relative' => ''));
+        $scanRoot = $root;
+        $startRelative = '';
+        if ($options['scope'] === 'current') {
+            $current = realpath("{$this->config['uploadDir']}/{$this->session['dir']}");
+            $normalizedCurrent = $current === false ? false : path::normalize($current);
+            if (
+                is_string($normalizedCurrent)
+                && ($normalizedCurrent === $root || str_starts_with($normalizedCurrent, $root . '/'))
+            ) {
+                $scanRoot = $normalizedCurrent;
+                $startRelative = ltrim(substr($normalizedCurrent, strlen($root)), '/');
+            }
+        }
+        $stack = array(array('physical' => $scanRoot, 'relative' => $startRelative));
         $matches = array();
         $scannedEntries = 0;
         $truncated = false;
+        $truncatedBy = null;
         $deadline = microtime(true) + ($options['timeoutMs'] / 1000);
 
         while (count($stack)) {
             if (microtime(true) >= $deadline) {
                 $truncated = true;
+                $truncatedBy = 'timeout';
                 break;
             }
 
@@ -1414,6 +1453,7 @@ class browser extends uploader
                 $matches[$current['relative']]['files'] = $matches[$current['relative']]['files'] ?? 0;
                 if (count($matches) >= $options['maxResults']) {
                     $truncated = true;
+                    $truncatedBy = 'maxResults';
                     break;
                 }
             }
@@ -1430,10 +1470,12 @@ class browser extends uploader
             foreach ($entries as $entry) {
                 if (++$scannedEntries > $options['maxEntries']) {
                     $truncated = true;
+                    $truncatedBy = 'maxEntries';
                     break 2;
                 }
                 if (microtime(true) >= $deadline) {
                     $truncated = true;
+                    $truncatedBy = 'timeout';
                     break 2;
                 }
 
@@ -1461,6 +1503,7 @@ class browser extends uploader
                 $matches[$directory]['files']++;
                 if (count($matches) >= $options['maxResults']) {
                     $truncated = true;
+                    $truncatedBy = 'maxResults';
                     break 2;
                 }
             }
@@ -1470,11 +1513,24 @@ class browser extends uploader
             }
         }
 
+        $matchedDirectories = 0;
+        $matchedFiles = 0;
+        foreach ($matches as $match) {
+            if (!empty($match['directory'])) {
+                $matchedDirectories++;
+            }
+            $matchedFiles += (int) ($match['files'] ?? 0);
+        }
+
         return array(
             'tree' => count($matches) ? $this->buildSearchTree($matches) : null,
             'resultCount' => count($matches),
+            'matchedDirectories' => $matchedDirectories,
+            'matchedFiles' => $matchedFiles,
             'scannedEntries' => $scannedEntries,
             'truncated' => $truncated,
+            'truncatedBy' => $truncatedBy,
+            'scope' => $options['scope'],
         );
     }
 
@@ -1535,6 +1591,7 @@ class browser extends uploader
         $info['matchedFiles'] = isset($matches[$relative])
             ? $matches[$relative]['files']
             : 0;
+        $info['searchPath'] = '/' . ltrim($relative, '/');
 
         if (!empty($children[$relative])) {
             $info['dirs'] = array();
@@ -1551,6 +1608,48 @@ class browser extends uploader
         }
 
         return $info;
+    }
+
+    private function pruneObservedDirectory($directory, array &$failed = array())
+    {
+        $entries = dir::content($directory, array('followLinks' => false));
+        if (!is_array($entries)) {
+            $failed[] = $directory;
+            return $failed;
+        }
+
+        foreach ($entries as $entry) {
+            if (is_dir($entry) && !is_link($entry)) {
+                $this->pruneObservedDirectory($entry, $failed);
+                continue;
+            }
+
+            $operation = new OperationContext(
+                'delete',
+                $this->operationLogicalPath($entry)
+            );
+            $previousState = $this->observeBefore($operation);
+            if (!@unlink($entry)) {
+                $failed[] = $entry;
+                continue;
+            }
+            $this->observeSucceeded($operation, $previousState);
+        }
+
+        $operation = new OperationContext(
+            'delete',
+            $this->operationLogicalPath($directory),
+            null,
+            OperationContext::RESOURCE_DIRECTORY
+        );
+        $previousState = $this->observeBefore($operation);
+        if (!@rmdir($directory)) {
+            $failed[] = $directory;
+            return $failed;
+        }
+        $this->observeSucceeded($operation, $previousState);
+
+        return count($failed) ? $failed : true;
     }
 
     private function postDir($existent = true)

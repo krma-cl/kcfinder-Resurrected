@@ -108,6 +108,11 @@ final class CharacterizationBrowser extends kcfinder\browser
         $this->operationObserver = $observer;
     }
 
+    public function setFixtureDirectory(string $directory): void
+    {
+        $this->session['dir'] = $directory;
+    }
+
     public function createObservedDirectory(): bool
     {
         return $this->act_newDir();
@@ -121,6 +126,16 @@ final class CharacterizationBrowser extends kcfinder\browser
     public function moveObservedFiles(): string|bool
     {
         return $this->act_mv_cbd();
+    }
+
+    public function copyObservedFiles(): string|bool
+    {
+        return $this->act_cp_cbd();
+    }
+
+    public function renameObservedDirectory(): string
+    {
+        return $this->act_renameDir();
     }
 
     public function deleteObservedFiles(): string|bool
@@ -171,6 +186,7 @@ final class CharacterizationBrowser extends kcfinder\browser
             'maxEntries' => 25000,
             'timeoutMs' => 1500,
             'debounceMs' => 350,
+            'scope' => 'global',
         ), $options);
         $_POST = $request;
 

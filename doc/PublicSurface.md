@@ -118,6 +118,8 @@ Superficies que deben conservar una ruta de migración:
 
 El núcleo futuro deberá normalizar estos valores en objetos internos sin obligar inicialmente a cambiar la configuración tradicional.
 
+Desde 4.8, un token CSRF emitido durante la primera petición se refleja también en el entorno de esa misma ejecución. Las solicitudes posteriores continúan exigiendo coincidencia entre sesión, cookie y parámetro enviado.
+
 ## Extensiones y capacidades
 
 La línea base diferencia requisitos de ejecución y capacidades:

@@ -91,10 +91,17 @@ _.runSearch = function (query) {
                 _.initDropUpload();
             }
 
-            if (data.truncated)
-                _.searchStatus(_.label("Partial results: {count} matching folders.", {count: data.resultCount}));
-            else
-                _.searchStatus(_.label("{count} matching folders.", {count: data.resultCount}));
+            var counts = {
+                    folders: data.matchedDirectories || 0,
+                    files: data.matchedFiles || 0
+                },
+                message = _.label("{folders} matching folders and {files} files.", counts);
+            if (data.truncated) {
+                message += ' ' + _.label("Partial results: {reason}.", {
+                    reason: _.searchTruncationReason(data.truncatedBy)
+                });
+            }
+            _.searchStatus(message);
             _.files = _.filterSearchFiles(_.searchOriginalFiles);
             _.orderFiles();
             _.fixFoldersHeight();
@@ -139,6 +146,16 @@ _.restoreSearchTree = function () {
 
 _.searchStatus = function (message) {
     $('#folderSearchStatus').text(message || '');
+};
+
+_.searchTruncationReason = function (reason) {
+    if (reason === 'maxResults')
+        return _.label("result limit reached");
+    if (reason === 'maxEntries')
+        return _.label("entry limit reached");
+    if (reason === 'timeout')
+        return _.label("time limit reached");
+    return _.label("configured limit reached");
 };
 
 _.filterSearchFiles = function (files) {

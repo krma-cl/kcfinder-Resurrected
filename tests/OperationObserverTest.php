@@ -144,6 +144,69 @@ final class OperationObserverTest extends TestCase
         self::assertSame('/target/one.txt', $this->observer->succeeded[0]['operation']->targetPath);
     }
 
+    public function testCopyEmitsSourceAndResultingPath(): void
+    {
+        $this->fixture->createTypeDirectory('source');
+        $this->fixture->createTypeDirectory('target');
+        $this->fixture->writeTypeFile('source/copy.txt', 'copy');
+        $_POST = array(
+            'csrf_token' => 'fixture-token',
+            'dir' => 'target',
+            'files' => array('files/source/copy.txt'),
+        );
+
+        self::assertTrue($this->fixture->browser()->copyObservedFiles());
+        self::assertSame('copy', $this->observer->succeeded[0]['operation']->operation);
+        self::assertSame('/source/copy.txt', $this->observer->succeeded[0]['operation']->path);
+        self::assertSame('/target/copy.txt', $this->observer->succeeded[0]['operation']->targetPath);
+        self::assertSame('snapshot:/source/copy.txt', $this->observer->succeeded[0]['state']);
+    }
+
+    public function testDirectoryRenameAndRecursiveDeleteEmitExactOperations(): void
+    {
+        $this->fixture->createTypeDirectory('documents/old/nested');
+        $this->fixture->writeTypeFile('documents/old/root.txt', 'root');
+        $this->fixture->writeTypeFile('documents/old/nested/child.txt', 'child');
+        $_POST = array(
+            'csrf_token' => 'fixture-token',
+            'dir' => 'documents/old',
+            'newName' => 'renamed',
+        );
+
+        self::assertSame(
+            array('name' => 'renamed'),
+            json_decode($this->fixture->browser()->renameObservedDirectory(), true, 512, JSON_THROW_ON_ERROR)
+        );
+
+        $_POST = array(
+            'csrf_token' => 'fixture-token',
+            'dir' => 'documents/renamed',
+        );
+        self::assertTrue($this->fixture->browser()->deleteFixtureDirectory());
+
+        $observed = array_map(
+            static fn (array $entry): array => $entry['operation']->toArray(),
+            $this->observer->succeeded
+        );
+        self::assertSame('rename', $observed[0]['operation']);
+        self::assertSame(OperationContext::RESOURCE_DIRECTORY, $observed[0]['resource']);
+        self::assertSame('/documents/old', $observed[0]['path']);
+        self::assertSame('/documents/renamed', $observed[0]['targetPath']);
+        self::assertSame(
+            array(
+                '/documents/renamed/nested/child.txt',
+                '/documents/renamed/nested',
+                '/documents/renamed/root.txt',
+                '/documents/renamed',
+            ),
+            array_column(array_slice($observed, 1), 'path')
+        );
+        self::assertSame(
+            array('file', 'directory', 'file', 'directory'),
+            array_column(array_slice($observed, 1), 'resource')
+        );
+    }
+
     public function testObserverFailuresDoNotTurnACompletedMutationIntoAnError(): void
     {
         $log = $this->fixture->root() . '/observer-errors.log';
